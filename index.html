@@ -125,20 +125,20 @@
     const SUPABASE_URL = 'https://dponfdhixuxriqqxbbri.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwb25mZGhpeHV4cmlxcXhiYnJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4NDk0NTYsImV4cCI6MjA3NzQyNTQ1Nn0.3l4yVUzenXVMrqWxFpXPq6IGpnBSlFK7rcXhkD-LRtw';
     const RENDER_SERVER_URL = 'https://webrealtor-backend.onrender.com';
-    let supabase;
+    let supabaseClient;
     let currentUser = null;
 
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       checkAuth();
     });
 
     // Authentication
-    async function login() {
+    window.login = async function() {
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
       if (error) alert(error.message);
       else {
         currentUser = data.user;
@@ -146,17 +146,17 @@
         document.getElementById('dashboard').classList.remove('hidden');
         loadDashboard();
       }
-    }
+    };
 
-    async function logout() {
-      await supabase.auth.signOut();
+    window.logout = async function() {
+      await supabaseClient.auth.signOut();
       currentUser = null;
       document.getElementById('loginScreen').classList.remove('hidden');
       document.getElementById('dashboard').classList.add('hidden');
-    }
+    };
 
     async function checkAuth() {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabaseClient.auth.getSession();
       if (session) {
         currentUser = session.user;
         document.getElementById('loginScreen').classList.add('hidden');
@@ -176,10 +176,10 @@
     }
 
     async function loadStats() {
-      const { count: clientsCount } = await supabase.from('clients').select('*', { count: 'exact', head: true });
-      const { count: referralsCount } = await supabase.from('referrals').select('*', { count: 'exact', head: true }).eq('status', 'pending');
-      const { count: agentsCount } = await supabase.from('agents').select('*', { count: 'exact', head: true }).eq('is_active', true);
-      const { count: emailsCount } = await supabase.from('email_logs').select('*', { count: 'exact', head: true });
+      const { count: clientsCount } = await supabaseClient.from('clients').select('*', { count: 'exact', head: true });
+      const { count: referralsCount } = await supabaseClient.from('referrals').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+      const { count: agentsCount } = await supabaseClient.from('agents').select('*', { count: 'exact', head: true }).eq('is_active', true);
+      const { count: emailsCount } = await supabaseClient.from('email_logs').select('*', { count: 'exact', head: true });
 
       document.getElementById('totalClients').textContent = clientsCount || 0;
       document.getElementById('activeReferrals').textContent = referralsCount || 0;
@@ -188,7 +188,7 @@
     }
 
     async function loadClients() {
-      const { data: clients } = await supabase.from('clients').select('*').order('created_at', { ascending: false }).limit(20);
+      const { data: clients } = await supabaseClient.from('clients').select('*').order('created_at', { ascending: false }).limit(20);
       const html = clients.map(c => `
         <div class="p-4 bg-slate-800 rounded">
           <p><strong>${c.name}</strong> - ${c.email}</p>
@@ -200,7 +200,7 @@
     }
 
     async function loadReferrals() {
-      const { data: referrals } = await supabase.from('referrals').select('*, clients(name, email), agents(name, email)').order('created_at', { ascending: false }).limit(20);
+      const { data: referrals } = await supabaseClient.from('referrals').select('*, clients(name, email), agents(name, email)').order('created_at', { ascending: false }).limit(20);
       const html = referrals.map(r => `
         <div class="p-4 bg-slate-800 rounded">
           <p><strong>${r.clients?.name}</strong> → ${r.agents?.name}</p>
@@ -212,7 +212,7 @@
     }
 
     async function loadAgents() {
-      const { data: agents } = await supabase.from('agents').select('*').order('created_at', { ascending: false }).limit(20);
+      const { data: agents } = await supabaseClient.from('agents').select('*').order('created_at', { ascending: false }).limit(20);
       const html = agents.map(a => `
         <div class="p-4 bg-slate-800 rounded">
           <p><strong>${a.name}</strong> - ${a.email}</p>
@@ -231,7 +231,7 @@
     }
 
     async function loadAnalytics() {
-      const { data: clients } = await supabase.from('clients').select('source_website');
+      const { data: clients } = await supabaseClient.from('clients').select('source_website');
       const siteCounts = {};
       clients.forEach(c => {
         siteCounts[c.source_website] = (siteCounts[c.source_website] || 0) + 1;
@@ -270,7 +270,7 @@
         languages: ['English'],
         is_active: true
       };
-      await supabase.from('agents').insert(agent);
+      await supabaseClient.from('agents').insert(agent);
       alert('Agent added!');
       loadAgents();
       e.target.reset();
@@ -293,18 +293,18 @@
     }
 
     async function updateReferralStatus(referralId, status) {
-      await supabase.from('referrals').update({ status }).eq('id', referralId);
+      await supabaseClient.from('referrals').update({ status }).eq('id', referralId);
       loadReferrals();
     }
 
     async function toggleAgentActive(agentId, isActive) {
-      await supabase.from('agents').update({ is_active: isActive }).eq('id', agentId);
+      await supabaseClient.from('agents').update({ is_active: isActive }).eq('id', agentId);
       loadAgents();
     }
 
     // Real-time subscriptions
     function setupRealtime() {
-      supabase.channel('dashboard')
+      supabaseClient.channel('dashboard')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'clients' }, () => loadDashboard())
         .on('postgres_changes', { event: '*', schema: 'public', table: 'referrals' }, () => loadDashboard())
         .on('postgres_changes', { event: '*', schema: 'public', table: 'agents' }, () => loadDashboard())
