@@ -55,10 +55,7 @@
       <button onclick="showTab('overview')" class="tab-btn px-4 py-2 bg-cyan-500 rounded" data-tab="overview">Overview</button>
       <button onclick="showTab('clients')" class="tab-btn px-4 py-2 bg-slate-700 rounded" data-tab="clients">Clients</button>
       <button onclick="showTab('referrals')" class="tab-btn px-4 py-2 bg-slate-700 rounded" data-tab="referrals">Referrals</button>
-      <button onclick="showTab('matching')" class="tab-btn px-4 py-2 bg-slate-700 rounded" data-tab="matching">Matching</button>
       <button onclick="showTab('agents')" class="tab-btn px-4 py-2 bg-slate-700 rounded" data-tab="agents">Agents</button>
-      <button onclick="showTab('scraper')" class="tab-btn px-4 py-2 bg-slate-700 rounded" data-tab="scraper">Scraper</button>
-      <button onclick="showTab('analytics')" class="tab-btn px-4 py-2 bg-slate-700 rounded" data-tab="analytics">Analytics</button>
     </div>
 
     <!-- Overview Tab -->
@@ -186,28 +183,7 @@
       </div>
     </div>
 
-    <!-- Matching Tab -->
-    <div id="matchingTab" class="tab-content hidden">
-      <div class="card p-6 rounded-lg mb-4">
-        <h2 class="text-xl font-bold mb-4">Real-time Match Visualization</h2>
-        <div id="liveMatchScores" class="space-y-4"></div>
-      </div>
-      
-      <div class="card p-6 rounded-lg mb-4">
-        <h2 class="text-xl font-bold mb-4">Match Quality Analytics</h2>
-        <div id="matchQualityAnalytics" class="grid grid-cols-3 gap-4"></div>
-      </div>
-      
-      <div class="card p-6 rounded-lg mb-4">
-        <h2 class="text-xl font-bold mb-4">Recent Specialty Matches</h2>
-        <div id="specialtyMatches" class="space-y-4"></div>
-      </div>
-      
-      <div class="card p-6 rounded-lg mb-4">
-        <h2 class="text-xl font-bold mb-4">Agent Performance Rankings</h2>
-        <div id="agentPerformanceRankings" class="space-y-4"></div>
-      </div>
-    </div>
+    <!-- Matching Tab - Removed, integrated into Clients/Referrals -->
 
     <!-- Agents Tab -->
     <div id="agentsTab" class="tab-content hidden">
@@ -283,66 +259,7 @@
       </div>
     </div>
 
-    <!-- Scraper Tab -->
-    <div id="scraperTab" class="tab-content hidden">
-      <h2 class="text-xl font-bold mb-4 text-cyan-400">🔧 Agent Discovery & Scraper</h2>
-      
-      <!-- Manual Scraper Trigger -->
-      <div class="bg-slate-800 p-6 rounded-lg mb-6">
-        <h3 class="text-lg font-semibold mb-4 text-white">Manual Agent Discovery</h3>
-        <div class="flex flex-col md:flex-row gap-4">
-          <div class="flex-1">
-            <label class="block text-sm font-medium text-slate-300 mb-2">Select City</label>
-            <select id="scrapeCity" class="w-full p-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:border-cyan-500 focus:outline-none">
-              <option value="">Choose a city...</option>
-              <option value="Miami">Miami</option>
-              <option value="Orlando">Orlando</option>
-              <option value="Tampa">Tampa</option>
-              <option value="Jacksonville">Jacksonville</option>
-              <option value="Fort Lauderdale">Fort Lauderdale</option>
-              <option value="West Palm Beach">West Palm Beach</option>
-              <option value="Naples">Naples</option>
-              <option value="Sarasota">Sarasota</option>
-              <option value="Gainesville">Gainesville</option>
-              <option value="Tallahassee">Tallahassee</option>
-              <option value="Pensacola">Pensacola</option>
-              <option value="custom">+ Custom City</option>
-            </select>
-            <input type="text" id="customCity" placeholder="Enter custom city name" class="w-full mt-2 p-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:border-cyan-500 focus:outline-none hidden">
-          </div>
-          <div class="flex items-end">
-            <button onclick="triggerScrape()" class="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg hover:from-cyan-600 hover:to-blue-600 transition-all transform hover:scale-105 font-semibold">
-              🔍 Start Discovery
-            </button>
-          </div>
-        </div>
-        <div id="scrapeStatus" class="mt-4 text-sm text-slate-400"></div>
-      </div>
-      
-      <!-- Scraper Analytics -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div class="bg-slate-800 p-4 rounded-lg">
-          <h4 class="text-sm font-medium text-slate-400 mb-1">Today's Discoveries</h4>
-          <p class="text-2xl font-bold text-cyan-400" id="todayScraped">0</p>
-        </div>
-        <div class="bg-slate-800 p-4 rounded-lg">
-          <h4 class="text-sm font-medium text-slate-400 mb-1">Success Rate</h4>
-          <p class="text-2xl font-bold text-green-400" id="scrapeSuccessRate">0%</p>
-        </div>
-        <div class="bg-slate-800 p-4 rounded-lg">
-          <h4 class="text-sm font-medium text-slate-400 mb-1">Avg Time/City</h4>
-          <p class="text-2xl font-bold text-purple-400" id="avgScrapeTime">0s</p>
-        </div>
-      </div>
-      
-      <!-- Scraper History -->
-      <div class="bg-slate-800 p-6 rounded-lg">
-        <h3 class="text-lg font-semibold mb-4 text-white">📊 Discovery History</h3>
-        <div id="scraperHistory" class="space-y-2">
-          <!-- History will be loaded here -->
-        </div>
-      </div>
-    </div>
+<!-- Scraper Tab - Removed, now automated -->
 
     <!-- Analytics Tab -->
     <div id="analyticsTab" class="tab-content hidden">
