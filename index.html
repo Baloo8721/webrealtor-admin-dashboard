@@ -659,26 +659,45 @@
 
     async function loadReferrals() {
       try {
-        const { data: referrals, error } = await supabaseClient
+        console.log('Loading referrals...');
+        
+        // First get raw referrals
+        const { data: rawReferrals, error: rawError } = await supabaseClient
           .from('referrals')
-          .select('*, clients(name, email, preferred_language, current_city, desired_city), agents(name, email, specialties)')
+          .select('*')
           .order('created_at', { ascending: false });
         
-        if (error) {
-          console.error('Error loading referrals:', error);
-          document.getElementById('referralsList').innerHTML = '<p class="text-red-400">Error loading referrals</p>';
+        console.log('Raw referrals:', rawReferrals, 'error:', rawError);
+        
+        if (rawError) {
+          console.error('Error loading referrals:', rawError);
+          document.getElementById('referralsList').innerHTML = '<p class="text-red-400">Error: ' + rawError.message + '</p>';
           return;
         }
         
-        if (!referrals || referrals.length === 0) {
-          document.getElementById('referralsList').innerHTML = '<p class="text-slate-400">No referrals yet</p>';
+        if (!rawReferrals || rawReferrals.length === 0) {
+          document.getElementById('referralsList').innerHTML = '<p class="text-slate-400">No referrals yet - when a client submits and matches with an agent, it will appear here.</p>';
+          document.getElementById('pipelineTotal').textContent = '0';
+          document.getElementById('pipelinePending').textContent = '0';
+          document.getElementById('pipelineMatched').textContent = '0';
+          document.getElementById('pipelineCompleted').textContent = '0';
           return;
         }
+        
+        // Get clients for each referral
+        const referrals = [];
+        for (const r of rawReferrals) {
+          const { data: client } = await supabaseClient.from('clients').select('name, email, preferred_language, current_city, desired_city').eq('id', r.client_id).single();
+          const { data: agent } = await supabaseClient.from('agents').select('name, email, specialties').eq('id', r.agent_id).single();
+          referrals.push({ ...r, clients: client, agents: agent });
+        }
+        
+        console.log('Processed referrals:', referrals);
         
         // Calculate pipeline counts
         const totalReferrals = referrals.length;
         const pendingReferrals = referrals.filter(r => r.status === 'pending').length;
-        const matchedReferrals = referrals.filter(r => r.status === 'matched').length;
+        const matchedReferrals = referrals.filter(r => r.status === 'matched' || r.status === 'accepted').length;
         const completedReferrals = referrals.filter(r => r.status === 'completed').length;
         
         // Update pipeline overview
