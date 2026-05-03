@@ -935,23 +935,75 @@
     }
     
     function displayAgents(agents) {
+      console.log('Displaying agents:', agents);
+      
+      if (!agents || agents.length === 0) {
+        document.getElementById('agentsList').innerHTML = '<p class="text-slate-400">No agents found</p>';
+        return;
+      }
+      
       const html = agents.map(a => {
-        const referralCount = a.referrals?.length || 0;
         const specialties = a.specialties || [];
         const languages = a.languages || [];
         const cities = a.service_cities || [];
+        const isActive = a.is_active === true || a.is_active === null || a.is_active === undefined;
         
-        // Calculate performance tier
-        let performanceTier = 'Bronze';
-        let tierColor = 'text-orange-400';
+        // No performance tier without referrals data
+        const performanceTier = '-';
+        const tierColor = 'text-slate-400';
         
-        if (referralCount > 0) {
-          const scores = a.referrals.map(r => r.match_score || 0);
-          const avgScore = scores.reduce((sum, score) => sum + score, 0) / scores.length;
-          
-          if (avgScore >= 0.8) {
-            performanceTier = 'Platinum';
-            tierColor = 'text-purple-400';
+        return `
+          <div class="p-4 bg-slate-800 rounded border border-slate-700 hover:border-cyan-500 transition-colors">
+            <div class="flex justify-between items-start mb-3">
+              <div>
+                <p class="font-bold text-white">${a.name || 'Unknown'}</p>
+                <p class="text-sm text-cyan-400">${a.email || 'No email'}</p>
+                ${a.brokerage ? `<p class="text-sm text-slate-400">${a.brokerage}</p>` : ''}
+              </div>
+              <div class="text-right">
+                <span class="text-lg font-bold ${tierColor}">${performanceTier}</span>
+                <p class="text-xs text-slate-400">0 referrals</p>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <span class="text-slate-400 text-sm">Service Area:</span>
+              <span class="text-white text-sm ml-1">${cities.slice(0, 3).join(', ') || 'None specified'}${cities.length > 3 ? '...' : ''}</span>
+            </div>
+            
+            ${specialties.length > 0 ? `
+              <div class="mb-3">
+                <span class="text-slate-400 text-sm">Specialties:</span>
+                <span class="text-white text-sm ml-1">${specialties.slice(0, 3).join(', ')}${specialties.length > 3 ? '...' : ''}</span>
+              </div>
+            ` : ''}
+            
+            ${languages.length > 0 ? `
+              <div class="mb-3">
+                <span class="text-slate-400 text-sm">Languages:</span>
+                <span class="text-white text-sm ml-1">${languages.join(', ')}</span>
+              </div>
+            ` : ''}
+            
+            <div class="flex justify-between items-center">
+              <span class="text-xs px-2 py-1 rounded ${isActive ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'}">
+                ${isActive ? 'Active' : 'Inactive'}
+              </span>
+              <div class="flex gap-2">
+                <button onclick="toggleAgentActive('${a.id}', ${!isActive})" class="px-3 py-1 ${isActive ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} rounded text-xs transition-colors">
+                  ${isActive ? 'Deactivate' : 'Activate'}
+                </button>
+                <button onclick="deleteAgent('${a.id}')" class="px-3 py-1 bg-red-700 hover:bg-red-800 rounded text-xs transition-colors">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      document.getElementById('agentsList').innerHTML = html;
+    }
           } else if (avgScore >= 0.7) {
             performanceTier = 'Gold';
             tierColor = 'text-yellow-400';
