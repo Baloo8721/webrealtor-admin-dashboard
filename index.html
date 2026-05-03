@@ -492,7 +492,6 @@
       await loadLiveMatchScores();
       await loadMatchQualityAnalytics();
       await loadSpecialtyMatches();
-      await loadAgentPerformanceRankings();
       await loadAgents();
       await loadScraperHistory();
       await loadAnalytics();
@@ -862,15 +861,26 @@
 
     async function loadAgents() {
       try {
-        const { data: agents } = await supabaseClient
+        const { data: agents, error } = await supabaseClient
           .from('agents')
-          .select('*, referrals(count), referrals!inner(match_score)')
+          .select('*')
           .order('created_at', { ascending: false });
+        
+        if (error) {
+          console.error('Error loading agents:', error);
+          document.getElementById('agentsList').innerHTML = '<p class="text-red-400">Error loading agents</p>';
+          return;
+        }
+        
+        if (!agents || agents.length === 0) {
+          document.getElementById('agentsList').innerHTML = '<p class="text-slate-400">No agents yet. Add agents manually or they will be added automatically when clients submit forms.</p>';
+          return;
+        }
         
         // Calculate performance metrics
         const totalAgents = agents.length;
         const activeAgents = agents.filter(a => a.is_active).length;
-        const agentsWithScores = agents.filter(a => a.referrals && a.referrals.length > 0);
+        const agentsWithScores = agents.filter(a => a.referrals_count > 0);
         const avgPerformance = agentsWithScores.length > 0
           ? agentsWithScores.reduce((sum, a) => {
               const scores = a.referrals.map(r => r.match_score || 0);
