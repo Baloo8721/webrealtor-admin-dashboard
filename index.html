@@ -811,9 +811,11 @@
           .select('*')
           .order('created_at', { ascending: false });
         
+        console.log('Loading agents:', agents, 'error:', error);
+        
         if (error) {
           console.error('Error loading agents:', error);
-          document.getElementById('agentsList').innerHTML = '<p class="text-red-400">Error loading agents</p>';
+          document.getElementById('agentsList').innerHTML = '<p class="text-red-400">Error loading agents: ' + error.message + '</p>';
           return;
         }
         
@@ -822,9 +824,12 @@
           return;
         }
         
+        // Display all agents in the list
+        displayAgents(agents);
+        
         // Calculate performance metrics
         const totalAgents = agents.length;
-        const activeAgents = agents.filter(a => a.is_active).length;
+        const activeAgents = agents.filter(a => a.is_active === true).length;
         const agentsWithScores = agents.filter(a => a.referrals_count > 0);
         const avgPerformance = agentsWithScores.length > 0
           ? agentsWithScores.reduce((sum, a) => {
