@@ -52,7 +52,8 @@
 
     <!-- Tabs -->
     <div class="flex gap-2 mb-6">
-      <button onclick="showTab('clients')" class="tab-btn px-4 py-2 bg-cyan-500 rounded" data-tab="clients">Clients</button>
+      <button onclick="showTab('overview')" class="tab-btn px-4 py-2 bg-cyan-500 rounded" data-tab="overview">Overview</button>
+      <button onclick="showTab('clients')" class="tab-btn px-4 py-2 bg-slate-700 rounded" data-tab="clients">Clients</button>
       <button onclick="showTab('referrals')" class="tab-btn px-4 py-2 bg-slate-700 rounded" data-tab="referrals">Referrals</button>
       <button onclick="showTab('matching')" class="tab-btn px-4 py-2 bg-slate-700 rounded" data-tab="matching">Matching</button>
       <button onclick="showTab('agents')" class="tab-btn px-4 py-2 bg-slate-700 rounded" data-tab="agents">Agents</button>
@@ -60,19 +61,128 @@
       <button onclick="showTab('analytics')" class="tab-btn px-4 py-2 bg-slate-700 rounded" data-tab="analytics">Analytics</button>
     </div>
 
-    <!-- Clients Tab -->
-    <div id="clientsTab" class="tab-content">
+    <!-- Overview Tab -->
+    <div id="overviewTab" class="tab-content">
+      <h2 class="text-xl font-bold mb-4 text-cyan-400">📈 Business Overview</h2>
+      
+      <!-- Key Metrics Dashboard -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+          <h4 class="text-sm font-medium text-slate-400 mb-1">Today's Leads</h4>
+          <p class="text-2xl font-bold text-cyan-400" id="todayLeads">0</p>
+          <p class="text-xs text-slate-500 mt-1">New submissions</p>
+        </div>
+        <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+          <h4 class="text-sm font-medium text-slate-400 mb-1">Active Pipeline</h4>
+          <p class="text-2xl font-bold text-yellow-400" id="activePipeline">0</p>
+          <p class="text-xs text-slate-500 mt-1">Pending + Matched</p>
+        </div>
+        <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+          <h4 class="text-sm font-medium text-slate-400 mb-1">Conversion Rate</h4>
+          <p class="text-2xl font-bold text-green-400" id="overviewConversion">0%</p>
+          <p class="text-xs text-slate-500 mt-1">This week</p>
+        </div>
+        <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+          <h4 class="text-sm font-medium text-slate-400 mb-1">Avg Match Quality</h4>
+          <p class="text-2xl font-bold text-purple-400" id="overviewMatchQuality">0%</p>
+          <p class="text-xs text-slate-500 mt-1">System performance</p>
+        </div>
+      </div>
+      
+      <!-- Recent Activity Feed -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-slate-800 p-6 rounded-lg">
+          <h3 class="text-lg font-semibold mb-4 text-white">🔥 Recent Activity</h3>
+          <div id="recentActivity" class="space-y-3">
+            <!-- Activity feed will be loaded here -->
+          </div>
+        </div>
+        
+        <div class="bg-slate-800 p-6 rounded-lg">
+          <h3 class="text-lg font-semibold mb-4 text-white">⚡ Quick Actions</h3>
+          <div class="space-y-3">
+            <button onclick="showTab('clients')" class="w-full px-4 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg hover:from-cyan-600 hover:to-blue-600 transition-all">
+              👥 View New Leads
+            </button>
+            <button onclick="showTab('referrals')" class="w-full px-4 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg hover:from-yellow-600 hover:to-orange-600 transition-all">
+              🎯 Manage Pipeline
+            </button>
+            <button onclick="showTab('agents')" class="w-full px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all">
+              👥 Agent Performance
+            </button>
+            <button onclick="showTab('scraper')" class="w-full px-4 py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-lg hover:from-green-600 hover:to-teal-600 transition-all">
+              🔍 Discover Agents
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+      
+      <!-- Clients Tab -->
+    <div id="clientsTab" class="tab-content hidden">
       <div class="card p-6 rounded-lg">
-        <h2 class="text-xl font-bold mb-4">Recent Client Submissions</h2>
+        <h2 class="text-xl font-bold mb-4 text-cyan-400">👥 Client Management</h2>
         <div id="clientsList" class="space-y-4"></div>
       </div>
     </div>
 
     <!-- Referrals Tab -->
     <div id="referralsTab" class="tab-content hidden">
-      <div class="card p-6 rounded-lg">
-        <h2 class="text-xl font-bold mb-4">Referral Status</h2>
-        <div id="referralsList" class="space-y-4"></div>
+      <h2 class="text-xl font-bold mb-4 text-cyan-400">🤝 Referral Pipeline Management</h2>
+      
+      <!-- Pipeline Overview -->
+      <div class="bg-slate-800 p-6 rounded-lg mb-6">
+        <h3 class="text-lg font-semibold mb-4 text-white">📊 Pipeline Overview</h3>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="text-center">
+            <div class="w-16 h-16 mx-auto bg-slate-700 rounded-full flex items-center justify-center mb-2">
+              <span class="text-2xl font-bold text-cyan-400" id="pipelineTotal">0</span>
+            </div>
+            <p class="text-sm text-slate-400">Total Referrals</p>
+          </div>
+          <div class="text-center">
+            <div class="w-16 h-16 mx-auto bg-slate-700 rounded-full flex items-center justify-center mb-2">
+              <span class="text-2xl font-bold text-yellow-400" id="pipelinePending">0</span>
+            </div>
+            <p class="text-sm text-slate-400">Pending</p>
+          </div>
+          <div class="text-center">
+            <div class="w-16 h-16 mx-auto bg-slate-700 rounded-full flex items-center justify-center mb-2">
+              <span class="text-2xl font-bold text-blue-400" id="pipelineMatched">0</span>
+            </div>
+            <p class="text-sm text-slate-400">Matched</p>
+          </div>
+          <div class="text-center">
+            <div class="w-16 h-16 mx-auto bg-slate-700 rounded-full flex items-center justify-center mb-2">
+              <span class="text-2xl font-bold text-green-400" id="pipelineCompleted">0</span>
+            </div>
+            <p class="text-sm text-slate-400">Completed</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Visual Pipeline Funnel -->
+      <div class="bg-slate-800 p-6 rounded-lg mb-6">
+        <h3 class="text-lg font-semibold mb-4 text-white">📈 Conversion Funnel</h3>
+        <div id="referralFunnel" class="space-y-3">
+          <!-- Funnel visualization will be loaded here -->
+        </div>
+      </div>
+      
+      <!-- Referral List with Actions -->
+      <div class="bg-slate-800 p-6 rounded-lg">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold text-white">📋 Referral Details</h3>
+          <div class="flex gap-2">
+            <button onclick="filterReferrals('all')" class="px-3 py-1 bg-slate-700 text-white rounded text-sm hover:bg-slate-600">All</button>
+            <button onclick="filterReferrals('pending')" class="px-3 py-1 bg-yellow-600 text-white rounded text-sm hover:bg-yellow-700">Pending</button>
+            <button onclick="filterReferrals('matched')" class="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">Matched</button>
+            <button onclick="filterReferrals('completed')" class="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">Completed</button>
+          </div>
+        </div>
+        <div id="referralsList" class="space-y-4">
+          <!-- Referrals will be loaded here -->
+        </div>
       </div>
     </div>
 
@@ -101,19 +211,73 @@
 
     <!-- Agents Tab -->
     <div id="agentsTab" class="tab-content hidden">
-      <div class="card p-6 rounded-lg mb-4">
-        <h2 class="text-xl font-bold mb-4">Add New Agent</h2>
-        <form id="addAgentForm" class="grid grid-cols-2 gap-4">
-          <input type="text" id="agentName" placeholder="Name" class="p-2 rounded bg-slate-800 border border-slate-600">
-          <input type="email" id="agentEmail" placeholder="Email" class="p-2 rounded bg-slate-800 border border-slate-600">
-          <input type="text" id="agentPhone" placeholder="Phone" class="p-2 rounded bg-slate-800 border border-slate-600">
-          <input type="text" id="agentBrokerage" placeholder="Brokerage" class="p-2 rounded bg-slate-800 border border-slate-600">
-          <input type="text" id="agentCities" placeholder="Cities (comma separated)" class="p-2 rounded bg-slate-800 border border-slate-600">
-          <input type="text" id="agentSpecialties" placeholder="Specialties (comma separated)" class="p-2 rounded bg-slate-800 border border-slate-600">
-          <button type="submit" class="col-span-2 p-2 bg-cyan-500 rounded font-bold">Add Agent</button>
-        </form>
+      <h2 class="text-xl font-bold mb-4 text-cyan-400">👥 Agent Performance Platform</h2>
+      
+      <!-- Agent Performance Overview -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+          <h4 class="text-sm font-medium text-slate-400 mb-1">Total Agents</h4>
+          <p class="text-2xl font-bold text-cyan-400" id="totalAgentsCount">0</p>
+          <p class="text-xs text-slate-500 mt-1">In database</p>
+        </div>
+        <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+          <h4 class="text-sm font-medium text-slate-400 mb-1">Active Agents</h4>
+          <p class="text-2xl font-bold text-green-400" id="activeAgentsCount">0</p>
+          <p class="text-xs text-slate-500 mt-1">Available for matching</p>
+        </div>
+        <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+          <h4 class="text-sm font-medium text-slate-400 mb-1">Avg Performance</h4>
+          <p class="text-2xl font-bold text-purple-400" id="avgAgentPerformance">0%</p>
+          <p class="text-xs text-slate-500 mt-1">Match score average</p>
+        </div>
+        <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+          <h4 class="text-sm font-medium text-slate-400 mb-1">Top Performers</h4>
+          <p class="text-2xl font-bold text-yellow-400" id="topPerformersCount">0</p>
+          <p class="text-xs text-slate-500 mt-1">70%+ match score</p>
+        </div>
       </div>
-      <div class="card p-6 rounded-lg">
+      
+      <!-- Geographic Coverage -->
+      <div class="bg-slate-800 p-6 rounded-lg mb-6">
+        <h3 class="text-lg font-semibold mb-4 text-white">🗺️ Geographic Coverage</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h4 class="text-sm font-medium text-slate-400 mb-3">Top Service Cities</h4>
+            <div id="topServiceCities" class="space-y-2">
+              <!-- City data will be loaded here -->
+            </div>
+          </div>
+          <div>
+            <h4 class="text-sm font-medium text-slate-400 mb-3">Specialty Distribution</h4>
+            <div id="agentSpecialtyDistribution" class="space-y-2">
+              <!-- Specialty data will be loaded here -->
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Agent Performance Rankings -->
+      <div class="bg-slate-800 p-6 rounded-lg mb-6">
+        <h3 class="text-lg font-semibold mb-4 text-white">🏆 Performance Rankings</h3>
+        <div id="agentPerformanceRankings" class="space-y-4">
+          <!-- Performance rankings will be loaded here -->
+        </div>
+      </div>
+      
+      <!-- Agent Management -->
+      <div class="bg-slate-800 p-6 rounded-lg">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold text-white">📋 Agent Management</h3>
+          <div class="flex gap-2">
+            <button onclick="filterAgents('all')" class="px-3 py-1 bg-slate-700 text-white rounded text-sm hover:bg-slate-600">All</button>
+            <button onclick="filterAgents('active')" class="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">Active</button>
+            <button onclick="filterAgents('inactive')" class="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">Inactive</button>
+            <button onclick="filterAgents('performers')" class="px-3 py-1 bg-purple-600 text-white rounded text-sm hover:bg-purple-700">Top Performers</button>
+          </div>
+        </div>
+        <div id="agentsList" class="space-y-4">
+          <!-- Agents will be loaded here -->
+        </div>
         <h2 class="text-xl font-bold mb-4">All Agents</h2>
         <div id="agentsList" class="space-y-4"></div>
       </div>
@@ -121,26 +285,156 @@
 
     <!-- Scraper Tab -->
     <div id="scraperTab" class="tab-content hidden">
-      <div class="card p-6 rounded-lg mb-4">
-        <h2 class="text-xl font-bold mb-4">Manual Scraper Trigger</h2>
-        <div class="flex gap-4">
-          <input type="text" id="scrapeCity" placeholder="City" class="p-2 rounded bg-slate-800 border border-slate-600">
-          <input type="text" id="scrapeState" placeholder="State (FL)" value="FL" class="p-2 rounded bg-slate-800 border border-slate-600">
-          <button onclick="triggerScraper()" class="p-2 bg-cyan-500 rounded font-bold">Scrape</button>
+      <h2 class="text-xl font-bold mb-4 text-cyan-400">🔧 Agent Discovery & Scraper</h2>
+      
+      <!-- Manual Scraper Trigger -->
+      <div class="bg-slate-800 p-6 rounded-lg mb-6">
+        <h3 class="text-lg font-semibold mb-4 text-white">Manual Agent Discovery</h3>
+        <div class="flex flex-col md:flex-row gap-4">
+          <div class="flex-1">
+            <label class="block text-sm font-medium text-slate-300 mb-2">Select City</label>
+            <select id="scrapeCity" class="w-full p-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:border-cyan-500 focus:outline-none">
+              <option value="">Choose a city...</option>
+              <option value="Miami">Miami</option>
+              <option value="Orlando">Orlando</option>
+              <option value="Tampa">Tampa</option>
+              <option value="Jacksonville">Jacksonville</option>
+              <option value="Fort Lauderdale">Fort Lauderdale</option>
+              <option value="West Palm Beach">West Palm Beach</option>
+              <option value="Naples">Naples</option>
+              <option value="Sarasota">Sarasota</option>
+              <option value="Gainesville">Gainesville</option>
+              <option value="Tallahassee">Tallahassee</option>
+              <option value="Pensacola">Pensacola</option>
+              <option value="custom">+ Custom City</option>
+            </select>
+            <input type="text" id="customCity" placeholder="Enter custom city name" class="w-full mt-2 p-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:border-cyan-500 focus:outline-none hidden">
+          </div>
+          <div class="flex items-end">
+            <button onclick="triggerScrape()" class="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg hover:from-cyan-600 hover:to-blue-600 transition-all transform hover:scale-105 font-semibold">
+              🔍 Start Discovery
+            </button>
+          </div>
         </div>
-        <div id="scraperStatus" class="mt-4"></div>
+        <div id="scrapeStatus" class="mt-4 text-sm text-slate-400"></div>
       </div>
-      <div class="card p-6 rounded-lg">
-        <h2 class="text-xl font-bold mb-4">Scraper History</h2>
-        <div id="scraperHistory" class="space-y-4"></div>
+      
+      <!-- Scraper Analytics -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="bg-slate-800 p-4 rounded-lg">
+          <h4 class="text-sm font-medium text-slate-400 mb-1">Today's Discoveries</h4>
+          <p class="text-2xl font-bold text-cyan-400" id="todayScraped">0</p>
+        </div>
+        <div class="bg-slate-800 p-4 rounded-lg">
+          <h4 class="text-sm font-medium text-slate-400 mb-1">Success Rate</h4>
+          <p class="text-2xl font-bold text-green-400" id="scrapeSuccessRate">0%</p>
+        </div>
+        <div class="bg-slate-800 p-4 rounded-lg">
+          <h4 class="text-sm font-medium text-slate-400 mb-1">Avg Time/City</h4>
+          <p class="text-2xl font-bold text-purple-400" id="avgScrapeTime">0s</p>
+        </div>
+      </div>
+      
+      <!-- Scraper History -->
+      <div class="bg-slate-800 p-6 rounded-lg">
+        <h3 class="text-lg font-semibold mb-4 text-white">📊 Discovery History</h3>
+        <div id="scraperHistory" class="space-y-2">
+          <!-- History will be loaded here -->
+        </div>
       </div>
     </div>
 
     <!-- Analytics Tab -->
     <div id="analyticsTab" class="tab-content hidden">
-      <div class="card p-6 rounded-lg">
-        <h2 class="text-xl font-bold mb-4">Site Performance</h2>
-        <div id="siteAnalytics" class="space-y-4"></div>
+      <h2 class="text-xl font-bold mb-4 text-cyan-400">📊 Site Performance Analytics</h2>
+      
+      <!-- Key Performance Indicators -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+          <h4 class="text-sm font-medium text-slate-400 mb-1">Total Leads</h4>
+          <p class="text-2xl font-bold text-cyan-400" id="totalLeads">0</p>
+          <p class="text-xs text-slate-500 mt-1">All time</p>
+        </div>
+        <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+          <h4 class="text-sm font-medium text-slate-400 mb-1">Conversion Rate</h4>
+          <p class="text-2xl font-bold text-green-400" id="conversionRate">0%</p>
+          <p class="text-xs text-slate-500 mt-1">Matched → Completed</p>
+        </div>
+        <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+          <h4 class="text-sm font-medium text-slate-400 mb-1">Avg Match Score</h4>
+          <p class="text-2xl font-bold text-purple-400" id="avgMatchScore">0%</p>
+          <p class="text-xs text-slate-500 mt-1">Quality indicator</p>
+        </div>
+        <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+          <h4 class="text-sm font-medium text-slate-400 mb-1">Active Agents</h4>
+          <p class="text-2xl font-bold text-yellow-400" id="activeAgents">0</p>
+          <p class="text-xs text-slate-500 mt-1">Ready to match</p>
+        </div>
+      </div>
+      
+      <!-- Detailed Analytics -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Traffic Sources -->
+        <div class="bg-slate-800 p-6 rounded-lg">
+          <h3 class="text-lg font-semibold mb-4 text-white">🌍 Traffic Sources</h3>
+          <div id="trafficSources" class="space-y-3">
+            <!-- Traffic sources will be loaded here -->
+          </div>
+        </div>
+        
+        <!-- Client Preferences -->
+        <div class="bg-slate-800 p-6 rounded-lg">
+          <h3 class="text-lg font-semibold mb-4 text-white">👥 Client Preferences</h3>
+          <div class="space-y-4">
+            <div>
+              <h4 class="text-sm font-medium text-slate-400 mb-2">Language Distribution</h4>
+              <div id="languageDistribution" class="space-y-2">
+                <!-- Language data will be loaded here -->
+              </div>
+            </div>
+            <div>
+              <h4 class="text-sm font-medium text-slate-400 mb-2">Top Destinations</h4>
+              <div id="topDestinations" class="space-y-2">
+                <!-- Destination data will be loaded here -->
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Conversion Funnel -->
+        <div class="bg-slate-800 p-6 rounded-lg">
+          <h3 class="text-lg font-semibold mb-4 text-white">📈 Conversion Funnel</h3>
+          <div id="conversionFunnel" class="space-y-3">
+            <!-- Funnel data will be loaded here -->
+          </div>
+        </div>
+        
+        <!-- Specialty Demand -->
+        <div class="bg-slate-800 p-6 rounded-lg">
+          <h3 class="text-lg font-semibold mb-4 text-white">🎯 Specialty Demand</h3>
+          <div id="specialtyDemand" class="space-y-2">
+            <!-- Specialty data will be loaded here -->
+          </div>
+        </div>
+      </div>
+      
+      <!-- Revenue Potential -->
+      <div class="bg-slate-800 p-6 rounded-lg mt-6">
+        <h3 class="text-lg font-semibold mb-4 text-white">💰 Revenue Potential</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="text-center">
+            <p class="text-3xl font-bold text-green-400" id="totalRevenuePotential">$0</p>
+            <p class="text-sm text-slate-400">Total Pipeline Value</p>
+          </div>
+          <div class="text-center">
+            <p class="text-3xl font-bold text-cyan-400" id="avgClientBudget">$0</p>
+            <p class="text-sm text-slate-400">Average Client Budget</p>
+          </div>
+          <div class="text-center">
+            <p class="text-3xl font-bold text-purple-400" id="highValueLeads">0</p>
+            <p class="text-sm text-slate-400">High Value Leads ($500k+)</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -191,16 +485,93 @@
 
     // Dashboard Data
     async function loadDashboard() {
-      loadStats();
-      loadClients();
-      loadReferrals();
-      loadLiveMatchScores();
-      loadMatchQualityAnalytics();
-      loadSpecialtyMatches();
-      loadAgentPerformanceRankings();
-      loadAgents();
-      loadScraperHistory();
-      loadAnalytics();
+      await loadOverview();
+      await loadStats();
+      await loadClients();
+      await loadReferrals();
+      await loadLiveMatchScores();
+      await loadMatchQualityAnalytics();
+      await loadSpecialtyMatches();
+      await loadAgentPerformanceRankings();
+      await loadAgents();
+      await loadScraperHistory();
+      await loadAnalytics();
+    }
+    
+    async function loadOverview() {
+      try {
+        // Get today's data
+        const today = new Date().toISOString().split('T')[0];
+        const { data: todayClients } = await supabaseClient.from('clients').select('*').gte('created_at', today);
+        const { data: referrals } = await supabaseClient.from('referrals').select('*');
+        const { data: agents } = await supabaseClient.from('agents').select('*').eq('is_active', true);
+        
+        // Calculate overview metrics
+        document.getElementById('todayLeads').textContent = todayClients.length || 0;
+        
+        const activePipeline = referrals.filter(r => r.status === 'pending' || r.status === 'matched').length;
+        document.getElementById('activePipeline').textContent = activePipeline;
+        
+        // Calculate weekly conversion rate
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        const weekReferrals = referrals.filter(r => new Date(r.created_at) > weekAgo);
+        const weekCompleted = weekReferrals.filter(r => r.status === 'completed').length;
+        const conversionRate = weekReferrals.length > 0 ? (weekCompleted / weekReferrals.length * 100).toFixed(1) : 0;
+        document.getElementById('overviewConversion').textContent = conversionRate + '%';
+        
+        // Calculate average match quality
+        const validScores = referrals.filter(r => r.match_score !== null);
+        const avgQuality = validScores.length > 0 
+          ? (validScores.reduce((sum, r) => sum + r.match_score, 0) / validScores.length * 100).toFixed(1)
+          : 0;
+        document.getElementById('overviewMatchQuality').textContent = avgQuality + '%';
+        
+        // Load recent activity
+        const recentActivity = [];
+        
+        // Add recent clients
+        todayClients.slice(0, 3).forEach(client => {
+          recentActivity.push({
+            type: 'client',
+            title: `New lead: ${client.name}`,
+            description: `Budget: $${client.budget_amount?.toLocaleString() || 'Not specified'}`,
+            time: new Date(client.created_at).toLocaleTimeString(),
+            icon: '👥',
+            color: 'text-cyan-400'
+          });
+        });
+        
+        // Add recent referrals
+        referrals.slice(0, 3).forEach(referral => {
+          recentActivity.push({
+            type: 'referral',
+            title: `${referral.clients?.name} → ${referral.agents?.name}`,
+            description: `Match: ${referral.match_score ? (referral.match_score * 100).toFixed(1) + '%' : 'N/A'}`,
+            time: new Date(referral.created_at).toLocaleTimeString(),
+            icon: '🎯',
+            color: 'text-yellow-400'
+          });
+        });
+        
+        // Sort by time and display
+        recentActivity.sort((a, b) => new Date(b.time) - new Date(a.time));
+        
+        const activityHtml = recentActivity.slice(0, 6).map(activity => `
+          <div class="flex items-start gap-3 p-3 bg-slate-700 rounded">
+            <span class="text-xl">${activity.icon}</span>
+            <div class="flex-1">
+              <p class="text-sm font-semibold text-white">${activity.title}</p>
+              <p class="text-xs text-slate-400">${activity.description}</p>
+              <p class="text-xs ${activity.color} mt-1">${activity.time}</p>
+            </div>
+          </div>
+        `).join('');
+        
+        document.getElementById('recentActivity').innerHTML = activityHtml || '<p class="text-slate-400">No recent activity</p>';
+      } catch (error) {
+        console.error('Error loading overview:', error);
+      }
     }
 
     async function loadStats() {
@@ -316,186 +687,529 @@
         const { data: referrals } = await supabaseClient
           .from('referrals')
           .select('*, clients(name, email, preferred_language, current_city, desired_city), agents(name, email, specialties)')
-          .order('created_at', { ascending: false })
-          .limit(20);
+          .order('created_at', { ascending: false });
         
-        const html = referrals.map(r => {
-          const matchScore = r.match_score ? (r.match_score * 100).toFixed(1) : 'N/A';
-          const statusColor = {
-            'pending': 'text-yellow-400',
-            'matched': 'text-green-400', 
-            'completed': 'text-blue-400',
-            'cancelled': 'text-red-400'
-          }[r.status] || 'text-slate-400';
-          
+        // Calculate pipeline counts
+        const totalReferrals = referrals.length;
+        const pendingReferrals = referrals.filter(r => r.status === 'pending').length;
+        const matchedReferrals = referrals.filter(r => r.status === 'matched').length;
+        const completedReferrals = referrals.filter(r => r.status === 'completed').length;
+        
+        // Update pipeline overview
+        document.getElementById('pipelineTotal').textContent = totalReferrals;
+        document.getElementById('pipelinePending').textContent = pendingReferrals;
+        document.getElementById('pipelineMatched').textContent = matchedReferrals;
+        document.getElementById('pipelineCompleted').textContent = completedReferrals;
+        
+        // Create funnel visualization
+        const funnelStages = [
+          { name: 'Pending', count: pendingReferrals, color: 'from-yellow-500 to-yellow-600' },
+          { name: 'Matched', count: matchedReferrals, color: 'from-blue-500 to-blue-600' },
+          { name: 'Completed', count: completedReferrals, color: 'from-green-500 to-green-600' }
+        ];
+        
+        const funnelHtml = funnelStages.map((stage, index) => {
+          const percentage = totalReferrals > 0 ? (stage.count / totalReferrals * 100).toFixed(1) : 0;
+          const width = Math.max(percentage, 5); // Minimum width for visibility
           return `
-            <div class="p-4 bg-slate-800 rounded border border-slate-700">
-              <div class="flex justify-between items-start mb-2">
-                <div>
-                  <p class="font-bold text-white">${r.clients?.name || 'Unknown'} → ${r.agents?.name || 'Unassigned'}</p>
-                  <p class="text-sm text-cyan-400">${r.clients?.email}</p>
-                  ${r.agents?.email ? `<p class="text-sm text-slate-400">Agent: ${r.agents.email}</p>` : ''}
-                </div>
-                <div class="text-right">
-                  <span class="text-lg font-bold ${matchScore !== 'N/A' ? 'text-cyan-400' : 'text-slate-400'}">${matchScore}%</span>
-                  <p class="text-xs ${statusColor}">${r.status || 'pending'}</p>
-                </div>
+            <div class="flex items-center gap-3">
+              <div class="w-20 text-right">
+                <span class="text-sm font-semibold text-white">${stage.name}</span>
+                <div class="text-xs text-slate-400">${stage.count} (${percentage}%)</div>
               </div>
-              
-              <div class="grid grid-cols-2 gap-2 text-sm mb-2">
-                <div>
-                  <span class="text-slate-400">From:</span>
-                  <span class="text-white ml-1">${r.clients?.current_city || 'Not specified'}</span>
-                </div>
-                <div>
-                  <span class="text-slate-400">To:</span>
-                  <span class="text-cyan-400 ml-1">${r.clients?.desired_city || 'Not specified'}</span>
-                </div>
-              </div>
-              
-              ${r.specialty_match !== undefined ? `
-                <div class="flex gap-4 text-xs mb-2">
-                  <span class="${r.specialty_match ? 'text-green-400' : 'text-red-400'}">
-                    Specialty: ${r.specialty_match ? '✓' : '✗'}
-                  </span>
-                  <span class="${r.language_match ? 'text-green-400' : 'text-red-400'}">
-                    Language: ${r.language_match ? '✓' : '✗'}
-                  </span>
-                  <span class="${r.location_match ? 'text-green-400' : 'text-red-400'}">
-                    Location: ${r.location_match ? '✓' : '✗'}
-                  </span>
-                </div>
-              ` : ''}
-              
-              <div class="flex justify-between items-center">
-                <span class="text-xs text-slate-400">${new Date(r.created_at).toLocaleDateString()}</span>
-                <div class="flex gap-2">
-                  ${r.status !== 'matched' ? `<button onclick="updateReferralStatus('${r.id}', 'matched')" class="px-2 py-1 bg-green-500 rounded text-xs hover:bg-green-600">Mark Matched</button>` : ''}
-                  ${r.status !== 'completed' ? `<button onclick="updateReferralStatus('${r.id}', 'completed')" class="px-2 py-1 bg-blue-500 rounded text-xs hover:bg-blue-600">Complete</button>` : ''}
+              <div class="flex-1">
+                <div class="h-8 bg-gradient-to-r ${stage.color} rounded flex items-center justify-center" style="width: ${width}%">
+                  <span class="text-xs font-bold text-white">${stage.count}</span>
                 </div>
               </div>
             </div>
           `;
         }).join('');
+        document.getElementById('referralFunnel').innerHTML = funnelHtml;
         
-        document.getElementById('referralsList').innerHTML = html || '<p class="text-slate-400">No referrals found</p>';
+        // Store referrals for filtering
+        window.allReferrals = referrals;
+        
+        // Display all referrals initially
+        displayReferrals(referrals);
       } catch (error) {
         console.error('Error loading referrals:', error);
         document.getElementById('referralsList').innerHTML = '<p class="text-red-400">Error loading referrals</p>';
       }
+    }
+    
+    function displayReferrals(referrals) {
+      const html = referrals.map(r => {
+        const matchScore = r.match_score ? (r.match_score * 100).toFixed(1) : 'N/A';
+        const statusColor = {
+          'pending': 'text-yellow-400',
+          'matched': 'text-blue-400', 
+          'completed': 'text-green-400',
+          'cancelled': 'text-red-400'
+        }[r.status] || 'text-slate-400';
+        
+        const statusIcon = {
+          'pending': '⏳',
+          'matched': '🎯', 
+          'completed': '✅',
+          'cancelled': '❌'
+        }[r.status] || '📋';
+        
+        return `
+          <div class="p-4 bg-slate-800 rounded border border-slate-700 hover:border-cyan-500 transition-colors">
+            <div class="flex justify-between items-start mb-3">
+              <div class="flex items-center gap-3">
+                <span class="text-2xl">${statusIcon}</span>
+                <div>
+                  <p class="font-bold text-white">${r.clients?.name || 'Unknown'} → ${r.agents?.name || 'Unassigned'}</p>
+                  <p class="text-sm text-cyan-400">${r.clients?.email}</p>
+                  ${r.agents?.email ? `<p class="text-sm text-slate-400">Agent: ${r.agents.email}</p>` : ''}
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="text-lg font-bold ${matchScore !== 'N/A' ? 'text-cyan-400' : 'text-slate-400'}">${matchScore}%</span>
+                <p class="text-xs ${statusColor}">${r.status || 'pending'}</p>
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-3 text-sm mb-3">
+              <div>
+                <span class="text-slate-400">From:</span>
+                <span class="text-white ml-1">${r.clients?.current_city || 'Not specified'}</span>
+              </div>
+              <div>
+                <span class="text-slate-400">To:</span>
+                <span class="text-cyan-400 ml-1">${r.clients?.desired_city || 'Not specified'}</span>
+              </div>
+            </div>
+            
+            ${r.specialty_match !== undefined ? `
+              <div class="flex gap-4 text-xs mb-3 p-2 bg-slate-700 rounded">
+                <span class="${r.specialty_match ? 'text-green-400' : 'text-red-400'}">
+                  🎯 Specialty: ${r.specialty_match ? '✓' : '✗'}
+                </span>
+                <span class="${r.language_match ? 'text-green-400' : 'text-red-400'}">
+                  🌐 Language: ${r.language_match ? '✓' : '✗'}
+                </span>
+                <span class="${r.location_match ? 'text-green-400' : 'text-red-400'}">
+                  📍 Location: ${r.location_match ? '✓' : '✗'}
+                </span>
+              </div>
+            ` : ''}
+            
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-slate-400">${new Date(r.created_at).toLocaleDateString()}</span>
+              <div class="flex gap-2">
+                ${r.status !== 'matched' ? `<button onclick="updateReferralStatus('${r.id}', 'matched')" class="px-2 py-1 bg-blue-500 rounded text-xs hover:bg-blue-600">Mark Matched</button>` : ''}
+                ${r.status !== 'completed' ? `<button onclick="updateReferralStatus('${r.id}', 'completed')" class="px-2 py-1 bg-green-500 rounded text-xs hover:bg-green-600">Complete</button>` : ''}
+                ${r.status !== 'cancelled' ? `<button onclick="updateReferralStatus('${r.id}', 'cancelled')" class="px-2 py-1 bg-red-500 rounded text-xs hover:bg-red-600">Cancel</button>` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      document.getElementById('referralsList').innerHTML = html || '<p class="text-slate-400">No referrals found</p>';
+    }
+    
+    function filterReferrals(status) {
+      const referrals = window.allReferrals || [];
+      const filtered = status === 'all' ? referrals : referrals.filter(r => r.status === status);
+      displayReferrals(filtered);
     }
 
     async function loadAgents() {
       try {
         const { data: agents } = await supabaseClient
           .from('agents')
-          .select('*, referrals(count)')
-          .order('created_at', { ascending: false })
-          .limit(20);
+          .select('*, referrals(count), referrals!inner(match_score)')
+          .order('created_at', { ascending: false });
         
-        const html = agents.map(a => {
-          const referralCount = a.referrals?.[0]?.count || 0;
-          const specialties = a.specialties || [];
-          const languages = a.languages || [];
-          const cities = a.service_cities || [];
-          
-          // Calculate performance tier based on available data
-          let performanceTier = 'Bronze';
-          let tierColor = 'text-orange-400';
-          
-          if (a.average_match_score >= 0.8) {
-            performanceTier = 'Platinum';
-            tierColor = 'text-purple-400';
-          } else if (a.average_match_score >= 0.7) {
-            performanceTier = 'Gold';
-            tierColor = 'text-yellow-400';
-          } else if (a.average_match_score >= 0.6) {
-            performanceTier = 'Silver';
-            tierColor = 'text-gray-300';
+        // Calculate performance metrics
+        const totalAgents = agents.length;
+        const activeAgents = agents.filter(a => a.is_active).length;
+        const agentsWithScores = agents.filter(a => a.referrals && a.referrals.length > 0);
+        const avgPerformance = agentsWithScores.length > 0
+          ? agentsWithScores.reduce((sum, a) => {
+              const scores = a.referrals.map(r => r.match_score || 0);
+              const avgScore = scores.reduce((s, score) => s + score, 0) / scores.length;
+              return sum + avgScore;
+            }, 0) / agentsWithScores.length * 100
+          : 0;
+        const topPerformers = agentsWithScores.filter(a => {
+          const scores = a.referrals.map(r => r.match_score || 0);
+          const avgScore = scores.reduce((s, score) => s + score, 0) / scores.length;
+          return avgScore >= 0.7;
+        }).length;
+        
+        // Update overview KPIs
+        document.getElementById('totalAgentsCount').textContent = totalAgents;
+        document.getElementById('activeAgentsCount').textContent = activeAgents;
+        document.getElementById('avgAgentPerformance').textContent = avgPerformance.toFixed(1) + '%';
+        document.getElementById('topPerformersCount').textContent = topPerformers;
+        
+        // Calculate geographic coverage
+        const cityCounts = {};
+        agents.forEach(agent => {
+          if (agent.service_cities) {
+            agent.service_cities.forEach(city => {
+              cityCounts[city] = (cityCounts[city] || 0) + 1;
+            });
           }
-          
-          return `
-            <div class="p-4 bg-slate-800 rounded border border-slate-700">
-              <div class="flex justify-between items-start mb-2">
-                <div>
-                  <p class="font-bold text-white">${a.name}</p>
-                  <p class="text-sm text-cyan-400">${a.email}</p>
-                  ${a.brokerage ? `<p class="text-sm text-slate-400">${a.brokerage}</p>` : ''}
-                </div>
-                <div class="text-right">
-                  <span class="text-lg font-bold ${tierColor}">${performanceTier}</span>
-                  <p class="text-xs text-slate-400">${referralCount} referrals</p>
-                </div>
-              </div>
-              
-              <div class="mb-2">
-                <span class="text-slate-400 text-sm">Cities: </span>
-                <span class="text-white text-sm">${cities.slice(0, 3).join(', ') || 'None specified'}${cities.length > 3 ? '...' : ''}</span>
-              </div>
-              
-              ${specialties.length > 0 ? `
-                <div class="mb-2">
-                  <span class="text-slate-400 text-sm">Specialties: </span>
-                  <span class="text-white text-sm">${specialties.slice(0, 3).join(', ')}${specialties.length > 3 ? '...' : ''}</span>
-                </div>
-              ` : ''}
-              
-              ${languages.length > 0 ? `
-                <div class="mb-2">
-                  <span class="text-slate-400 text-sm">Languages: </span>
-                  <span class="text-white text-sm">${languages.join(', ')}</span>
-                </div>
-              ` : ''}
-              
-              ${a.average_match_score ? `
-                <div class="mb-2">
-                  <span class="text-slate-400 text-sm">Avg Match Score: </span>
-                  <span class="text-cyan-400 text-sm font-semibold">${(a.average_match_score * 100).toFixed(1)}%</span>
-                </div>
-              ` : ''}
-              
-              <div class="flex justify-between items-center">
-                <span class="text-xs text-slate-400">${a.is_active ? 'Active' : 'Inactive'}</span>
-                <button onclick="toggleAgentActive('${a.id}', ${!a.is_active})" class="px-2 py-1 ${a.is_active ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} rounded text-xs transition-colors">
-                  ${a.is_active ? 'Deactivate' : 'Activate'}
-                </button>
-              </div>
-            </div>
-          `;
-        }).join('');
+        });
         
-        document.getElementById('agentsList').innerHTML = html || '<p class="text-slate-400">No agents found</p>';
+        const cityHtml = Object.entries(cityCounts)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 8)
+          .map(([city, count]) => {
+            const percentage = (count / agents.length * 100).toFixed(1);
+            return `
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-white">${city}</span>
+                <div class="flex items-center gap-2">
+                  <div class="w-20 bg-slate-700 rounded-full h-2">
+                    <div class="bg-cyan-500 h-2 rounded-full" style="width: ${percentage}%"></div>
+                  </div>
+                  <span class="text-sm font-bold text-cyan-400">${count} agents</span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        document.getElementById('topServiceCities').innerHTML = cityHtml || '<p class="text-slate-400">No city data</p>';
+        
+        // Calculate specialty distribution
+        const specialtyCounts = {};
+        agents.forEach(agent => {
+          if (agent.specialties) {
+            agent.specialties.forEach(specialty => {
+              specialtyCounts[specialty] = (specialtyCounts[specialty] || 0) + 1;
+            });
+          }
+        });
+        
+        const specialtyHtml = Object.entries(specialtyCounts)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 8)
+          .map(([specialty, count]) => {
+            const percentage = (count / agents.length * 100).toFixed(1);
+            return `
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-white">${specialty}</span>
+                <span class="text-sm font-bold text-purple-400">${count} (${percentage}%)</span>
+              </div>
+            `;
+          }).join('');
+        document.getElementById('agentSpecialtyDistribution').innerHTML = specialtyHtml || '<p class="text-slate-400">No specialty data</p>';
+        
+        // Store agents for filtering
+        window.allAgents = agents;
+        
+        // Load performance rankings
+        await loadAgentPerformanceRankings();
+        
+        // Display all agents initially
+        displayAgents(agents);
       } catch (error) {
         console.error('Error loading agents:', error);
         document.getElementById('agentsList').innerHTML = '<p class="text-red-400">Error loading agents</p>';
       }
     }
+    
+    function displayAgents(agents) {
+      const html = agents.map(a => {
+        const referralCount = a.referrals?.length || 0;
+        const specialties = a.specialties || [];
+        const languages = a.languages || [];
+        const cities = a.service_cities || [];
+        
+        // Calculate performance tier
+        let performanceTier = 'Bronze';
+        let tierColor = 'text-orange-400';
+        
+        if (referralCount > 0) {
+          const scores = a.referrals.map(r => r.match_score || 0);
+          const avgScore = scores.reduce((sum, score) => sum + score, 0) / scores.length;
+          
+          if (avgScore >= 0.8) {
+            performanceTier = 'Platinum';
+            tierColor = 'text-purple-400';
+          } else if (avgScore >= 0.7) {
+            performanceTier = 'Gold';
+            tierColor = 'text-yellow-400';
+          } else if (avgScore >= 0.6) {
+            performanceTier = 'Silver';
+            tierColor = 'text-gray-300';
+          }
+        }
+        
+        return `
+          <div class="p-4 bg-slate-800 rounded border border-slate-700 hover:border-cyan-500 transition-colors">
+            <div class="flex justify-between items-start mb-3">
+              <div>
+                <p class="font-bold text-white">${a.name}</p>
+                <p class="text-sm text-cyan-400">${a.email}</p>
+                ${a.brokerage ? `<p class="text-sm text-slate-400">${a.brokerage}</p>` : ''}
+              </div>
+              <div class="text-right">
+                <span class="text-lg font-bold ${tierColor}">${performanceTier}</span>
+                <p class="text-xs text-slate-400">${referralCount} referrals</p>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <span class="text-slate-400 text-sm">Service Area:</span>
+              <span class="text-white text-sm ml-1">${cities.slice(0, 3).join(', ') || 'None specified'}${cities.length > 3 ? '...' : ''}</span>
+            </div>
+            
+            ${specialties.length > 0 ? `
+              <div class="mb-3">
+                <span class="text-slate-400 text-sm">Specialties:</span>
+                <span class="text-white text-sm ml-1">${specialties.slice(0, 3).join(', ')}${specialties.length > 3 ? '...' : ''}</span>
+              </div>
+            ` : ''}
+            
+            ${languages.length > 0 ? `
+              <div class="mb-3">
+                <span class="text-slate-400 text-sm">Languages:</span>
+                <span class="text-white text-sm ml-1">${languages.join(', ')}</span>
+              </div>
+            ` : ''}
+            
+            <div class="flex justify-between items-center">
+              <span class="text-xs px-2 py-1 rounded ${a.is_active ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'}">
+                ${a.is_active ? 'Active' : 'Inactive'}
+              </span>
+              <button onclick="toggleAgentActive('${a.id}', ${!a.is_active})" class="px-3 py-1 ${a.is_active ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} rounded text-xs transition-colors">
+                ${a.is_active ? 'Deactivate' : 'Activate'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      document.getElementById('agentsList').innerHTML = html || '<p class="text-slate-400">No agents found</p>';
+    }
+    
+    function filterAgents(filter) {
+      const agents = window.allAgents || [];
+      let filtered = agents;
+      
+      switch(filter) {
+        case 'active':
+          filtered = agents.filter(a => a.is_active);
+          break;
+        case 'inactive':
+          filtered = agents.filter(a => !a.is_active);
+          break;
+        case 'performers':
+          filtered = agents.filter(a => {
+            if (!a.referrals || a.referrals.length === 0) return false;
+            const scores = a.referrals.map(r => r.match_score || 0);
+            const avgScore = scores.reduce((sum, score) => sum + score, 0) / scores.length;
+            return avgScore >= 0.7;
+          });
+          break;
+      }
+      
+      displayAgents(filtered);
+    }
 
+    // Scraper functions
+    async function triggerScrape() {
+      const citySelect = document.getElementById('scrapeCity');
+      const customCityInput = document.getElementById('customCity');
+      const statusDiv = document.getElementById('scrapeStatus');
+      
+      let city = citySelect.value;
+      if (city === 'custom') {
+        city = customCityInput.value.trim();
+        if (!city) {
+          statusDiv.innerHTML = '<span class="text-red-400">Please enter a custom city name</span>';
+          return;
+        }
+      } else if (!city) {
+        statusDiv.innerHTML = '<span class="text-red-400">Please select a city</span>';
+        return;
+      }
+      
+      statusDiv.innerHTML = '<span class="text-yellow-400">🔍 Starting agent discovery...</span>';
+      
+      try {
+        const response = await fetch('https://webrealtor-backend.onrender.com/api/scrape', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ city, state: 'FL' })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          statusDiv.innerHTML = `<span class="text-green-400">✅ Successfully discovered ${result.count} agents in ${city}, FL</span>`;
+          // Refresh scraper history and analytics
+          await loadScraperHistory();
+          await loadAgents(); // Refresh agent list
+        } else {
+          statusDiv.innerHTML = `<span class="text-red-400">❌ Error: ${result.error}</span>`;
+        }
+      } catch (error) {
+        console.error('Scrape error:', error);
+        statusDiv.innerHTML = '<span class="text-red-400">❌ Failed to connect to scraper service</span>';
+      }
+    }
+    
+    // Handle city selection change
+    document.addEventListener('DOMContentLoaded', function() {
+      const citySelect = document.getElementById('scrapeCity');
+      const customCityInput = document.getElementById('customCity');
+      
+      if (citySelect && customCityInput) {
+        citySelect.addEventListener('change', function() {
+          if (this.value === 'custom') {
+            customCityInput.classList.remove('hidden');
+            customCityInput.focus();
+          } else {
+            customCityInput.classList.add('hidden');
+            customCityInput.value = '';
+          }
+        });
+      }
+    });
+    
     async function loadScraperHistory() {
-      // This would need a scraper_logs table - add to schema
-      document.getElementById('scraperHistory').innerHTML = '<p class="text-slate-400">Scraper history coming soon</p>';
+      try {
+        const response = await fetch('https://webrealtor-backend.onrender.com/api/scraper-metrics');
+        const data = await response.json();
+        
+        if (!data || data.length === 0) {
+          document.getElementById('scraperHistory').innerHTML = '<p class="text-slate-400">No scraping history available</p>';
+          return;
+        }
+        
+        // Calculate analytics
+        const today = new Date().toISOString().split('T')[0];
+        const todayScrapes = data.filter(log => log.scraped_at.startsWith(today));
+        const totalAgents = todayScrapes.reduce((sum, log) => sum + (log.agents_found || 0), 0);
+        const successfulScrapes = data.filter(log => log.success).length;
+        const successRate = data.length > 0 ? (successfulScrapes / data.length * 100).toFixed(1) : 0;
+        const avgTime = data.length > 0 
+          ? (data.reduce((sum, log) => sum + (log.scraping_time_ms || 0), 0) / data.length / 1000).toFixed(1)
+          : 0;
+        
+        // Update analytics display
+        document.getElementById('todayScraped').textContent = totalAgents;
+        document.getElementById('scrapeSuccessRate').textContent = successRate + '%';
+        document.getElementById('avgScrapeTime').textContent = avgTime + 's';
+        
+        // Display history
+        const historyHtml = data.slice(0, 20).map(log => {
+          const date = new Date(log.scraped_at);
+          const timeStr = date.toLocaleString();
+          const agentsFound = log.agents_found || 0;
+          const timeTaken = (log.scraping_time_ms / 1000).toFixed(1);
+          const success = log.success;
+          
+          return `
+            <div class="p-3 bg-slate-700 rounded border border-slate-600">
+              <div class="flex justify-between items-center">
+                <div>
+                  <span class="font-semibold text-white">${log.city}, ${log.state}</span>
+                  <span class="ml-2 text-xs text-slate-400">${timeStr}</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="text-sm ${success ? 'text-green-400' : 'text-red-400'}">
+                    ${success ? '✅' : '❌'}
+                  </span>
+                  <span class="text-sm text-cyan-400">${agentsFound} agents</span>
+                  <span class="text-xs text-slate-400">${timeTaken}s</span>
+                </div>
+              </div>
+              ${log.errors && log.errors.length > 0 ? `
+                <div class="mt-2 text-xs text-red-400">
+                  Errors: ${log.errors.slice(0, 2).join(', ')}${log.errors.length > 2 ? '...' : ''}
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join('');
+        
+        document.getElementById('scraperHistory').innerHTML = historyHtml;
+      } catch (error) {
+        console.error('Error loading scraper history:', error);
+        document.getElementById('scraperHistory').innerHTML = '<p class="text-red-400">Error loading scraper history</p>';
+      }
     }
 
     async function loadAnalytics() {
       try {
-        const { data: clients } = await supabaseClient.from('clients').select('source_website, created_at, preferred_language, desired_city');
-        const { data: referrals } = await supabaseClient.from('referrals').select('created_at, status, match_score');
+        const { data: clients } = await supabaseClient.from('clients').select('*');
+        const { data: referrals } = await supabaseClient.from('referrals').select('*');
+        const { data: agents } = await supabaseClient.from('agents').select('*').eq('is_active', true);
         
-        // Source website analytics
+        // Update KPIs
+        document.getElementById('totalLeads').textContent = clients.length || 0;
+        document.getElementById('activeAgents').textContent = agents.length || 0;
+        
+        // Calculate conversion rate
+        const completedReferrals = referrals.filter(r => r.status === 'completed').length;
+        const matchedReferrals = referrals.filter(r => r.status === 'matched' || r.status === 'completed').length;
+        const conversionRate = matchedReferrals > 0 ? (completedReferrals / matchedReferrals * 100).toFixed(1) : 0;
+        document.getElementById('conversionRate').textContent = conversionRate + '%';
+        
+        // Calculate average match score
+        const validScores = referrals.filter(r => r.match_score !== null);
+        const avgScore = validScores.length > 0 
+          ? (validScores.reduce((sum, r) => sum + r.match_score, 0) / validScores.length * 100).toFixed(1)
+          : 0;
+        document.getElementById('avgMatchScore').textContent = avgScore + '%';
+        
+        // Traffic Sources
         const siteCounts = {};
         clients.forEach(c => {
           const site = c.source_website || 'Direct';
           siteCounts[site] = (siteCounts[site] || 0) + 1;
         });
         
-        // Language preference analytics
+        const trafficHtml = Object.entries(siteCounts)
+          .sort((a, b) => b[1] - a[1])
+          .map(([site, count]) => {
+            const percentage = (count / clients.length * 100).toFixed(1);
+            return `
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-white">${site}</span>
+                <div class="flex items-center gap-2">
+                  <div class="w-24 bg-slate-700 rounded-full h-2">
+                    <div class="bg-cyan-500 h-2 rounded-full" style="width: ${percentage}%"></div>
+                  </div>
+                  <span class="text-sm font-bold text-cyan-400">${count} (${percentage}%)</span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        document.getElementById('trafficSources').innerHTML = trafficHtml || '<p class="text-slate-400">No traffic data</p>';
+        
+        // Language Distribution
         const languageCounts = {};
         clients.forEach(c => {
           const lang = c.preferred_language || 'English';
           languageCounts[lang] = (languageCounts[lang] || 0) + 1;
         });
         
-        // Top desired cities
+        const languageHtml = Object.entries(languageCounts)
+          .sort((a, b) => b[1] - a[1])
+          .map(([lang, count]) => {
+            const percentage = (count / clients.length * 100).toFixed(1);
+            return `
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-white">${lang}</span>
+                <span class="text-sm font-bold text-green-400">${count} (${percentage}%)</span>
+              </div>
+            `;
+          }).join('');
+        document.getElementById('languageDistribution').innerHTML = languageHtml || '<p class="text-slate-400">No language data</p>';
+        
+        // Top Destinations
         const cityCounts = {};
         clients.forEach(c => {
           if (c.desired_city) {
@@ -503,80 +1217,82 @@
           }
         });
         
-        // Referral status analytics
-        const statusCounts = {};
-        referrals.forEach(r => {
-          const status = r.status || 'pending';
-          statusCounts[status] = (statusCounts[status] || 0) + 1;
-        });
+        const cityHtml = Object.entries(cityCounts)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5)
+          .map(([city, count]) => {
+            return `
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-white">${city}</span>
+                <span class="text-sm font-bold text-purple-400">${count}</span>
+              </div>
+            `;
+          }).join('');
+        document.getElementById('topDestinations').innerHTML = cityHtml || '<p class="text-slate-400">No destination data</p>';
         
-        // Calculate conversion rate
-        const totalReferrals = referrals.length;
-        const matchedReferrals = referrals.filter(r => r.status === 'matched' || r.status === 'completed').length;
-        const conversionRate = totalReferrals > 0 ? (matchedReferrals / totalReferrals * 100).toFixed(1) : 0;
+        // Conversion Funnel
+        const funnelStages = [
+          { name: 'Total Leads', count: clients.length, color: 'text-cyan-400' },
+          { name: 'Referrals Created', count: referrals.length, color: 'text-blue-400' },
+          { name: 'Matched', count: matchedReferrals, color: 'text-yellow-400' },
+          { name: 'Completed', count: completedReferrals, color: 'text-green-400' }
+        ];
         
-        const html = `
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="p-4 bg-slate-800 rounded">
-              <h4 class="font-bold text-cyan-400 mb-3">Traffic Sources</h4>
-              ${Object.entries(siteCounts).map(([site, count]) => `
-                <div class="flex justify-between items-center mb-2">
-                  <span class="text-sm">${site}</span>
-                  <span class="font-bold text-cyan-400">${count} leads</span>
-                </div>
-              `).join('')}
-            </div>
-            
-            <div class="p-4 bg-slate-800 rounded">
-              <h4 class="font-bold text-green-400 mb-3">Language Preferences</h4>
-              ${Object.entries(languageCounts).map(([lang, count]) => `
-                <div class="flex justify-between items-center mb-2">
-                  <span class="text-sm">${lang}</span>
-                  <span class="font-bold text-green-400">${count} clients</span>
-                </div>
-              `).join('')}
-            </div>
-            
-            <div class="p-4 bg-slate-800 rounded">
-              <h4 class="font-bold text-purple-400 mb-3">Top Destinations</h4>
-              ${Object.entries(cityCounts).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([city, count]) => `
-                <div class="flex justify-between items-center mb-2">
-                  <span class="text-sm">${city}</span>
-                  <span class="font-bold text-purple-400">${count} requests</span>
-                </div>
-              `).join('')}
-            </div>
-            
-            <div class="p-4 bg-slate-800 rounded">
-              <h4 class="font-bold text-yellow-400 mb-3">Conversion Metrics</h4>
-              <div class="space-y-2">
+        const funnelHtml = funnelStages.map((stage, index) => {
+          const percentage = index === 0 ? 100 : (stage.count / funnelStages[0].count * 100).toFixed(1);
+          return `
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center">
+                <span class="text-xs font-bold ${stage.color}">${index + 1}</span>
+              </div>
+              <div class="flex-1">
                 <div class="flex justify-between items-center">
-                  <span class="text-sm">Total Referrals:</span>
-                  <span class="font-bold">${totalReferrals}</span>
+                  <span class="text-sm text-white">${stage.name}</span>
+                  <span class="text-sm font-bold ${stage.color}">${stage.count} (${percentage}%)</span>
                 </div>
-                <div class="flex justify-between items-center">
-                  <span class="text-sm">Matched/Completed:</span>
-                  <span class="font-bold text-green-400">${matchedReferrals}</span>
+                <div class="w-full bg-slate-700 rounded-full h-2 mt-1">
+                  <div class="bg-gradient-to-r ${stage.color.replace('text-', 'from-')} h-2 rounded-full" style="width: ${percentage}%"></div>
                 </div>
-                <div class="flex justify-between items-center">
-                  <span class="text-sm">Conversion Rate:</span>
-                  <span class="font-bold text-cyan-400">${conversionRate}%</span>
-                </div>
-                ${Object.entries(statusCounts).map(([status, count]) => `
-                  <div class="flex justify-between items-center">
-                    <span class="text-sm capitalize">${status}:</span>
-                    <span class="font-bold text-slate-300">${count}</span>
-                  </div>
-                `).join('')}
               </div>
             </div>
-          </div>
-        `;
+          `;
+        }).join('');
+        document.getElementById('conversionFunnel').innerHTML = funnelHtml;
         
-        document.getElementById('siteAnalytics').innerHTML = html;
+        // Specialty Demand
+        const specialtyCounts = {};
+        clients.forEach(c => {
+          if (c.agent_specialties) {
+            c.agent_specialties.forEach(specialty => {
+              specialtyCounts[specialty] = (specialtyCounts[specialty] || 0) + 1;
+            });
+          }
+        });
+        
+        const specialtyHtml = Object.entries(specialtyCounts)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 8)
+          .map(([specialty, count]) => {
+            return `
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-white">${specialty}</span>
+                <span class="text-sm font-bold text-orange-400">${count}</span>
+              </div>
+            `;
+          }).join('');
+        document.getElementById('specialtyDemand').innerHTML = specialtyHtml || '<p class="text-slate-400">No specialty data</p>';
+        
+        // Revenue Potential
+        const totalBudget = clients.reduce((sum, c) => sum + (c.budget_amount || 0), 0);
+        const avgBudget = clients.length > 0 ? totalBudget / clients.length : 0;
+        const highValueLeads = clients.filter(c => c.budget_amount >= 500000).length;
+        
+        document.getElementById('totalRevenuePotential').textContent = '$' + totalBudget.toLocaleString();
+        document.getElementById('avgClientBudget').textContent = '$' + Math.round(avgBudget).toLocaleString();
+        document.getElementById('highValueLeads').textContent = highValueLeads;
+        
       } catch (error) {
         console.error('Error loading analytics:', error);
-        document.getElementById('siteAnalytics').innerHTML = '<p class="text-red-400">Error loading analytics</p>';
       }
     }
 
