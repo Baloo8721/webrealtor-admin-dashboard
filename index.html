@@ -617,7 +617,18 @@
 
     async function loadClients() {
       try {
-        const { data: clients } = await supabaseClient.from('clients').select('*, agents(name)').order('created_at', { ascending: false }).limit(20);
+        const { data: clients, error } = await supabaseClient.from('clients').select('*').order('created_at', { ascending: false }).limit(20);
+        
+        if (error) {
+          console.error('Error loading clients:', error);
+          document.getElementById('clientsList').innerHTML = '<p class="text-red-400">Error loading clients</p>';
+          return;
+        }
+        
+        if (!clients) {
+          document.getElementById('clientsList').innerHTML = '<p class="text-slate-400">No clients yet</p>';
+          return;
+        }
         
         const statusColors = {
           'pending_matching': 'text-purple-400 bg-purple-900',
@@ -704,10 +715,21 @@
 
     async function loadReferrals() {
       try {
-        const { data: referrals } = await supabaseClient
+        const { data: referrals, error } = await supabaseClient
           .from('referrals')
           .select('*, clients(name, email, preferred_language, current_city, desired_city), agents(name, email, specialties)')
           .order('created_at', { ascending: false });
+        
+        if (error) {
+          console.error('Error loading referrals:', error);
+          document.getElementById('referralsList').innerHTML = '<p class="text-red-400">Error loading referrals</p>';
+          return;
+        }
+        
+        if (!referrals || referrals.length === 0) {
+          document.getElementById('referralsList').innerHTML = '<p class="text-slate-400">No referrals yet</p>';
+          return;
+        }
         
         // Calculate pipeline counts
         const totalReferrals = referrals.length;
@@ -925,7 +947,7 @@
         window.allAgents = agents;
         
         // Load performance rankings
-        await loadAgentPerformanceRankings();
+
         
         // Display all agents initially
         displayAgents(agents);
