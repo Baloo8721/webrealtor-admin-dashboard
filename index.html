@@ -829,20 +829,18 @@
         
         // Calculate performance metrics
         const totalAgents = agents.length;
-        const activeAgents = agents.filter(a => a.is_active === true).length;
-        const agentsWithScores = agents.filter(a => a.referrals_count > 0);
-        const avgPerformance = agentsWithScores.length > 0
-          ? agentsWithScores.reduce((sum, a) => {
-              const scores = a.referrals.map(r => r.match_score || 0);
-              const avgScore = scores.reduce((s, score) => s + score, 0) / scores.length;
-              return sum + avgScore;
-            }, 0) / agentsWithScores.length * 100
-          : 0;
-        const topPerformers = agentsWithScores.filter(a => {
-          const scores = a.referrals.map(r => r.match_score || 0);
-          const avgScore = scores.reduce((s, score) => s + score, 0) / scores.length;
-          return avgScore >= 0.7;
-        }).length;
+        const activeAgents = agents.filter(a => a.is_active === true || a.is_active === null || a.is_active === undefined).length;
+        
+        // Update the KPIs in the overview section
+        if (document.getElementById('totalAgentsCount')) {
+          document.getElementById('totalAgentsCount').textContent = totalAgents;
+        }
+        if (document.getElementById('activeAgentsCount')) {
+          document.getElementById('activeAgentsCount').textContent = activeAgents;
+        }
+        
+        const avgPerformance = 0;
+        const topPerformers = 0;
         
         // Update overview KPIs
         document.getElementById('totalAgentsCount').textContent = totalAgents;
