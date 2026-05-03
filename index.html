@@ -1004,67 +1004,6 @@
       
       document.getElementById('agentsList').innerHTML = html;
     }
-          } else if (avgScore >= 0.7) {
-            performanceTier = 'Gold';
-            tierColor = 'text-yellow-400';
-          } else if (avgScore >= 0.6) {
-            performanceTier = 'Silver';
-            tierColor = 'text-gray-300';
-          }
-        }
-        
-        return `
-          <div class="p-4 bg-slate-800 rounded border border-slate-700 hover:border-cyan-500 transition-colors">
-            <div class="flex justify-between items-start mb-3">
-              <div>
-                <p class="font-bold text-white">${a.name}</p>
-                <p class="text-sm text-cyan-400">${a.email}</p>
-                ${a.brokerage ? `<p class="text-sm text-slate-400">${a.brokerage}</p>` : ''}
-              </div>
-              <div class="text-right">
-                <span class="text-lg font-bold ${tierColor}">${performanceTier}</span>
-                <p class="text-xs text-slate-400">${referralCount} referrals</p>
-              </div>
-            </div>
-            
-            <div class="mb-3">
-              <span class="text-slate-400 text-sm">Service Area:</span>
-              <span class="text-white text-sm ml-1">${cities.slice(0, 3).join(', ') || 'None specified'}${cities.length > 3 ? '...' : ''}</span>
-            </div>
-            
-            ${specialties.length > 0 ? `
-              <div class="mb-3">
-                <span class="text-slate-400 text-sm">Specialties:</span>
-                <span class="text-white text-sm ml-1">${specialties.slice(0, 3).join(', ')}${specialties.length > 3 ? '...' : ''}</span>
-              </div>
-            ` : ''}
-            
-            ${languages.length > 0 ? `
-              <div class="mb-3">
-                <span class="text-slate-400 text-sm">Languages:</span>
-                <span class="text-white text-sm ml-1">${languages.join(', ')}</span>
-              </div>
-            ` : ''}
-            
-            <div class="flex justify-between items-center">
-              <span class="text-xs px-2 py-1 rounded ${a.is_active ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'}">
-                ${a.is_active ? 'Active' : 'Inactive'}
-              </span>
-              <div class="flex gap-2">
-                <button onclick="toggleAgentActive('${a.id}', ${!a.is_active})" class="px-3 py-1 ${a.is_active ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} rounded text-xs transition-colors">
-                  ${a.is_active ? 'Deactivate' : 'Activate'}
-                </button>
-                <button onclick="deleteAgent('${a.id}')" class="px-3 py-1 bg-red-700 hover:bg-red-800 rounded text-xs transition-colors">
-                  Delete
-                </button>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-      
-      document.getElementById('agentsList').innerHTML = html || '<p class="text-slate-400">No agents found</p>';
-    }
     
     function filterAgents(filter) {
       const agents = window.allAgents || [];
