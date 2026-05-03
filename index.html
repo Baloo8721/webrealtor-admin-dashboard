@@ -213,6 +213,35 @@
         </div>
       </div>
       
+      <!-- Add Agent Form -->
+      <div class="bg-slate-800 p-6 rounded-lg mb-6">
+        <h3 class="text-lg font-semibold mb-4 text-white">➕ Add New Agent</h3>
+        <form id="addAgentFormNew" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <input type="text" id="newAgentName" placeholder="Agent Name *" class="p-2 rounded bg-slate-700 border border-slate-600 text-white">
+          <input type="email" id="newAgentEmail" placeholder="Email *" class="p-2 rounded bg-slate-700 border border-slate-600 text-white">
+          <input type="text" id="newAgentPhone" placeholder="Phone" class="p-2 rounded bg-slate-700 border border-slate-600 text-white">
+          <input type="text" id="newAgentBrokerage" placeholder="Brokerage" class="p-2 rounded bg-slate-700 border border-slate-600 text-white">
+          <input type="text" id="newAgentCities" placeholder="Service Cities (comma separated)" class="p-2 rounded bg-slate-700 border border-slate-600 text-white">
+          <input type="text" id="newAgentSpecialties" placeholder="Specialties (comma separated)" class="p-2 rounded bg-slate-700 border border-slate-600 text-white">
+          <input type="text" id="newAgentLanguages" placeholder="Languages (comma separated)" class="p-2 rounded bg-slate-700 border border-slate-600 text-white">
+          <select id="newAgentState" class="p-2 rounded bg-slate-700 border border-slate-600 text-white">
+            <option value="FL">Florida</option>
+            <option value="CA">California</option>
+            <option value="TX">Texas</option>
+            <option value="NY">New York</option>
+            <option value="WA">Washington</option>
+            <option value="AZ">Arizona</option>
+            <option value="NV">Nevada</option>
+            <option value="CO">Colorado</option>
+            <option value="GA">Georgia</option>
+            <option value="NC">North Carolina</option>
+            <option value="IL">Illinois</option>
+            <option value="MA">Massachusetts</option>
+          </select>
+          <button type="submit" class="px-4 py-2 bg-cyan-500 text-white rounded font-bold hover:bg-cyan-600">Add Agent</button>
+        </form>
+      </div>
+      
       <!-- Geographic Coverage -->
       <div class="bg-slate-800 p-6 rounded-lg mb-6">
         <h3 class="text-lg font-semibold mb-4 text-white">🗺️ Geographic Coverage</h3>
@@ -613,8 +642,9 @@
               
               <div class="flex justify-between items-center text-xs text-slate-400">
                 <span>Source: ${c.source_website || 'Direct'}</span>
-                <div>
-                  ${c.status === 'pending_matching' ? `<button onclick="triggerMatchingForClient('${c.id}')" class="px-2 py-1 bg-purple-500 rounded text-xs hover:bg-purple-600 mr-2">⚡ Match Now</button>` : ''}
+                <div class="flex gap-2">
+                  ${c.status === 'pending_matching' ? `<button onclick="triggerMatchingForClient('${c.id}')" class="px-2 py-1 bg-purple-500 rounded text-xs hover:bg-purple-600">⚡ Match</button>` : ''}
+                  <button onclick="deleteClient('${c.id}')" class="px-2 py-1 bg-red-700 rounded text-xs hover:bg-red-800">Delete</button>
                   <span>${new Date(c.created_at).toLocaleDateString()}</span>
                 </div>
               </div>
@@ -948,9 +978,14 @@
               <span class="text-xs px-2 py-1 rounded ${a.is_active ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'}">
                 ${a.is_active ? 'Active' : 'Inactive'}
               </span>
-              <button onclick="toggleAgentActive('${a.id}', ${!a.is_active})" class="px-3 py-1 ${a.is_active ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} rounded text-xs transition-colors">
-                ${a.is_active ? 'Deactivate' : 'Activate'}
-              </button>
+              <div class="flex gap-2">
+                <button onclick="toggleAgentActive('${a.id}', ${!a.is_active})" class="px-3 py-1 ${a.is_active ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} rounded text-xs transition-colors">
+                  ${a.is_active ? 'Deactivate' : 'Activate'}
+                </button>
+                <button onclick="deleteAgent('${a.id}')" class="px-3 py-1 bg-red-700 hover:bg-red-800 rounded text-xs transition-colors">
+                  Delete
+                </button>
+              </div>
             </div>
           </div>
         `;
@@ -1557,6 +1592,57 @@
       loadAgents();
       e.target.reset();
     });
+
+    // New Add Agent Form
+    document.getElementById('addAgentFormNew').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('newAgentName').value;
+      const email = document.getElementById('newAgentEmail').value;
+      if (!name || !email) {
+        alert('Name and Email are required!');
+        return;
+      }
+      const agent = {
+        name: name,
+        email: email,
+        phone: document.getElementById('newAgentPhone').value,
+        brokerage: document.getElementById('newAgentBrokerage').value,
+        service_cities: document.getElementById('newAgentCities').value ? document.getElementById('newAgentCities').value.split(',').map(s => s.trim()) : [],
+        specialties: document.getElementById('newAgentSpecialties').value ? document.getElementById('newAgentSpecialties').value.split(',').map(s => s.trim()) : ['General Real Estate'],
+        languages: document.getElementById('newAgentLanguages').value ? document.getElementById('newAgentLanguages').value.split(',').map(s => s.trim()) : ['English'],
+        service_states: [document.getElementById('newAgentState').value],
+        is_active: true
+      };
+      const { error } = await supabaseClient.from('agents').insert(agent);
+      if (error) {
+        alert('Error adding agent: ' + error.message);
+      } else {
+        alert('Agent added successfully!');
+        loadAgents();
+        e.target.reset();
+      }
+    });
+
+    // Delete Agent
+    window.deleteAgent = async function(agentId) {
+      if (!confirm('Delete this agent? This cannot be undone.')) return;
+      await supabaseClient.from('agents').delete().eq('id', agentId);
+      loadAgents();
+    };
+
+    // Toggle Agent Active
+    window.toggleAgentActive = async function(agentId, isActive) {
+      await supabaseClient.from('agents').update({ is_active: isActive }).eq('id', agentId);
+      loadAgents();
+    };
+
+    // Delete Client
+    window.deleteClient = async function(clientId) {
+      if (!confirm('Delete this client and their referrals? This cannot be undone.')) return;
+      await supabaseClient.from('referrals').delete().eq('client_id', clientId);
+      await supabaseClient.from('clients').delete().eq('id', clientId);
+      loadClients();
+    };
 
     async function triggerScraper() {
       const city = document.getElementById('scrapeCity').value;
