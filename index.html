@@ -617,18 +617,27 @@
 
     async function loadClients() {
       try {
-        const { data: clients } = await supabaseClient.from('clients').select('*').order('created_at', { ascending: false }).limit(20);
+        const { data: clients } = await supabaseClient.from('clients').select('*, agents(name)').order('created_at', { ascending: false }).limit(20);
+        
+        const statusColors = {
+          'pending_matching': 'text-purple-400 bg-purple-900',
+          'matched': 'text-green-400 bg-green-900',
+          'pending': 'text-yellow-400 bg-yellow-900'
+        };
         
         const html = clients.map(c => {
-          // Format specialties for display
           const specialties = c.agent_specialties || [];
           const specialtyText = specialties.length > 0 ? specialties.slice(0, 3).join(', ') + (specialties.length > 3 ? '...' : '') : 'None specified';
-          
-          // Format language preference
           const language = c.preferred_language || 'English';
           const languageFlag = {
             'en': '🇺🇸', 'es': '🇪🇸', 'zh': '🇨🇳', 'ar': '🇸🇦', 'ru': '🇷🇺', 'pt': '🇵🇹', 'fr': '🇫🇷', 'it': '🇮🇹', 'de': '🇩🇪', 'ja': '🇯🇵', 'sv': '🇸🇪', 'ko': '🇰🇷'
           }[language] || '🌐';
+          const statusClass = statusColors[c.status] || 'text-slate-400 bg-slate-700';
+          const statusLabel = {
+            'pending_matching': '🔄 Being Matched',
+            'matched': '✅ Matched',
+            'pending': '⏳ Pending'
+          }[c.status] || '📋 New';
           
           return `
             <div class="p-4 bg-slate-800 rounded border border-slate-700 hover:border-cyan-500 transition-colors">
@@ -641,6 +650,7 @@
                 <div class="text-right">
                   <span class="text-2xl">${languageFlag}</span>
                   <p class="text-xs text-slate-400">${language}</p>
+                  <span class="text-xs px-2 py-1 rounded ${statusClass}">${statusLabel}</span>
                 </div>
               </div>
               
@@ -660,6 +670,13 @@
                 <span class="text-white text-sm">${specialtyText}</span>
               </div>
               
+              ${c.agents ? `
+                <div class="mb-2 text-sm">
+                  <span class="text-slate-400">Matched Agent: </span>
+                  <span class="text-green-400">${c.agents.name}</span>
+                </div>
+              ` : ''}
+              
               ${c.budget_amount ? `
                 <div class="mb-2">
                   <span class="text-slate-400 text-sm">Budget: </span>
@@ -669,7 +686,10 @@
               
               <div class="flex justify-between items-center text-xs text-slate-400">
                 <span>Source: ${c.source_website || 'Direct'}</span>
-                <span>${new Date(c.created_at).toLocaleDateString()}</span>
+                <div>
+                  ${c.status === 'pending_matching' ? `<button onclick="triggerMatchingForClient('${c.id}')" class="px-2 py-1 bg-purple-500 rounded text-xs hover:bg-purple-600 mr-2">⚡ Match Now</button>` : ''}
+                  <span>${new Date(c.created_at).toLocaleDateString()}</span>
+                </div>
               </div>
             </div>
           `;
@@ -743,16 +763,16 @@
         const matchScore = r.match_score ? (r.match_score * 100).toFixed(1) : 'N/A';
         const statusColor = {
           'pending': 'text-yellow-400',
-          'matched': 'text-blue-400', 
-          'completed': 'text-green-400',
-          'cancelled': 'text-red-400'
+          'accepted': 'text-green-400', 
+          'declined': 'text-red-400',
+          'pending_matching': 'text-purple-400'
         }[r.status] || 'text-slate-400';
         
         const statusIcon = {
-          'pending': '⏳',
-          'matched': '🎯', 
-          'completed': '✅',
-          'cancelled': '❌'
+          'pending': '⏳ Waiting for agent',
+          'accepted': '✅ Agent accepted', 
+          'declined': '❌ Agent declined',
+          'pending_matching': '🔄 Being matched'
         }[r.status] || '📋';
         
         return `
@@ -798,11 +818,11 @@
             ` : ''}
             
             <div class="flex justify-between items-center">
-              <span class="text-xs text-slate-400">${new Date(r.created_at).toLocaleDateString()}</span>
+              <span class="text-xs text-slate-400">${new Date(r.created_at).toLocaleDateString()} ${r.referral_order ? '| Attempt #' + r.referral_order : ''}</span>
               <div class="flex gap-2">
-                ${r.status !== 'matched' ? `<button onclick="updateReferralStatus('${r.id}', 'matched')" class="px-2 py-1 bg-blue-500 rounded text-xs hover:bg-blue-600">Mark Matched</button>` : ''}
-                ${r.status !== 'completed' ? `<button onclick="updateReferralStatus('${r.id}', 'completed')" class="px-2 py-1 bg-green-500 rounded text-xs hover:bg-green-600">Complete</button>` : ''}
-                ${r.status !== 'cancelled' ? `<button onclick="updateReferralStatus('${r.id}', 'cancelled')" class="px-2 py-1 bg-red-500 rounded text-xs hover:bg-red-600">Cancel</button>` : ''}
+                ${r.status === 'pending' ? `<button onclick="updateReferralStatus('${r.id}', 'accepted')" class="px-2 py-1 bg-green-500 rounded text-xs hover:bg-green-600">Accept</button>` : ''}
+                ${r.status === 'pending' ? `<button onclick="updateReferralStatus('${r.id}', 'declined')" class="px-2 py-1 bg-red-500 rounded text-xs hover:bg-red-600">Decline</button>` : ''}
+                ${r.status === 'declined' ? `<button onclick="triggerMatchingForClient('${r.client_id}')" class="px-2 py-1 bg-purple-500 rounded text-xs hover:bg-purple-600">Retry Match</button>` : ''}
               </div>
             </div>
           </div>
@@ -1613,6 +1633,52 @@
     async function toggleAgentActive(agentId, isActive) {
       await supabaseClient.from('agents').update({ is_active: isActive }).eq('id', agentId);
       loadAgents();
+    }
+
+    async function triggerMatchingForClient(clientId) {
+      if (!confirm('Manually trigger matching for this client?')) return;
+      
+      try {
+        // Get client data
+        const { data: client } = await supabaseClient
+          .from('clients')
+          .select('*')
+          .eq('id', clientId)
+          .single();
+        
+        if (!client) {
+          alert('Client not found');
+          return;
+        }
+        
+        // Update status to matching
+        await supabaseClient
+          .from('clients')
+          .update({ status: 'pending_matching' })
+          .eq('id', clientId);
+        
+        // Call backend to trigger matching
+        const response = await fetch('https://webrealtor-backend.onrender.com/api/trigger-match', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            client_id: clientId,
+            desired_city: client.desired_city,
+            specialty: client.agent_specialties?.[0],
+            language: client.preferred_language
+          })
+        });
+        
+        if (response.ok) {
+          alert('Matching triggered! Client will be matched shortly.');
+          loadClients();
+        } else {
+          alert('Error triggering matching. Check backend logs.');
+        }
+      } catch (error) {
+        console.error('Error triggering matching:', error);
+        alert('Error triggering matching: ' + error.message);
+      }
     }
 
     // Real-time subscriptions
