@@ -54,6 +54,7 @@
     <div class="flex gap-2 mb-6">
       <button onclick="showTab('clients')" class="tab-btn px-4 py-2 bg-cyan-500 rounded" data-tab="clients">Clients</button>
       <button onclick="showTab('referrals')" class="tab-btn px-4 py-2 bg-slate-700 rounded" data-tab="referrals">Referrals</button>
+      <button onclick="showTab('matching')" class="tab-btn px-4 py-2 bg-slate-700 rounded" data-tab="matching">Matching</button>
       <button onclick="showTab('agents')" class="tab-btn px-4 py-2 bg-slate-700 rounded" data-tab="agents">Agents</button>
       <button onclick="showTab('scraper')" class="tab-btn px-4 py-2 bg-slate-700 rounded" data-tab="scraper">Scraper</button>
       <button onclick="showTab('analytics')" class="tab-btn px-4 py-2 bg-slate-700 rounded" data-tab="analytics">Analytics</button>
@@ -72,6 +73,29 @@
       <div class="card p-6 rounded-lg">
         <h2 class="text-xl font-bold mb-4">Referral Status</h2>
         <div id="referralsList" class="space-y-4"></div>
+      </div>
+    </div>
+
+    <!-- Matching Tab -->
+    <div id="matchingTab" class="tab-content hidden">
+      <div class="card p-6 rounded-lg mb-4">
+        <h2 class="text-xl font-bold mb-4">Real-time Match Visualization</h2>
+        <div id="liveMatchScores" class="space-y-4"></div>
+      </div>
+      
+      <div class="card p-6 rounded-lg mb-4">
+        <h2 class="text-xl font-bold mb-4">Match Quality Analytics</h2>
+        <div id="matchQualityAnalytics" class="grid grid-cols-3 gap-4"></div>
+      </div>
+      
+      <div class="card p-6 rounded-lg mb-4">
+        <h2 class="text-xl font-bold mb-4">Recent Specialty Matches</h2>
+        <div id="specialtyMatches" class="space-y-4"></div>
+      </div>
+      
+      <div class="card p-6 rounded-lg mb-4">
+        <h2 class="text-xl font-bold mb-4">Agent Performance Rankings</h2>
+        <div id="agentPerformanceRankings" class="space-y-4"></div>
       </div>
     </div>
 
@@ -170,6 +194,10 @@
       loadStats();
       loadClients();
       loadReferrals();
+      loadLiveMatchScores();
+      loadMatchQualityAnalytics();
+      loadSpecialtyMatches();
+      loadAgentPerformanceRankings();
       loadAgents();
       loadScraperHistory();
       loadAnalytics();
@@ -243,6 +271,339 @@
         </div>
       `).join('');
       document.getElementById('siteAnalytics').innerHTML = html;
+    }
+
+    // Load real-time match visualization
+    async function loadLiveMatchScores() {
+      const { data: recentReferrals } = await supabaseClient
+        .from('referrals')
+        .select('*, clients(name, email, specialties), agents(name, email, specialties)')
+        .order('created_at', { ascending: false })
+        .limit(5);
+      
+      const html = recentReferrals.map(referral => {
+        const clientSpecialties = referral.client_specialties || [];
+        const agentSpecialties = referral.agents?.specialties || [];
+        
+        return `
+          <div class="p-4 bg-slate-800 rounded">
+            <h4 class="font-bold">${referral.clients?.name} → ${referral.agents?.name}</h4>
+            <div class="mt-2">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-sm">Overall Match Score:</span>
+                <div class="flex items-center">
+                  <div class="w-32 bg-slate-700 rounded-full h-2 mr-2">
+                    <div class="bg-cyan-500 h-2 rounded-full" style="width: ${(referral.match_score * 100).toFixed(0)}%"></div>
+                  </div>
+                  <span class="text-cyan-400 font-bold">${(referral.match_score * 100).toFixed(1)}%</span>
+                </div>
+              </div>
+              <div class="grid grid-cols-3 gap-2 text-xs">
+                <div class="flex justify-between">
+                  <span>Specialty:</span>
+                  <span class="${referral.specialty_match ? 'text-green-400' : 'text-red-400'}">
+                    ${referral.specialty_match ? '✓' : '✗'}
+                  </span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Language:</span>
+                  <span class="${referral.language_match ? 'text-green-400' : 'text-red-400'}">
+                    ${referral.language_match ? '✓' : '✗'}
+                  </span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Location:</span>
+                  <span class="${referral.location_match ? 'text-green-400' : 'text-red-400'}">
+                    ${referral.location_match ? '✓' : '✗'}
+                  </span>
+                </div>
+              </div>
+              <div class="text-xs text-slate-400 mt-2">
+                Client: ${clientSpecialties.join(', ') || 'None'} | Agent: ${agentSpecialties.slice(0, 3).join(', ') || 'None'}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      document.getElementById('liveMatchScores').innerHTML = html || '<p class="text-slate-400">No recent matches found</p>';
+    }
+
+    // Load comprehensive match quality analytics
+    async function loadMatchQualityAnalytics() {
+      const { data: referrals } = await supabaseClient
+        .from('referrals')
+        .select('match_score, specialty_match, language_match, location_match, created_at');
+      
+      if (!referrals || referrals.length === 0) {
+        document.getElementById('matchQualityAnalytics').innerHTML = '<p class="text-slate-400">No match data available</p>';
+        return;
+      }
+      
+      // Calculate analytics
+      const totalMatches = referrals.length;
+      const avgMatchScore = referrals.reduce((sum, r) => sum + (r.match_score || 0), 0) / totalMatches;
+      const specialtyMatchRate = referrals.filter(r => r.specialty_match).length / totalMatches * 100;
+      const languageMatchRate = referrals.filter(r => r.language_match).length / totalMatches * 100;
+      const locationMatchRate = referrals.filter(r => r.location_match).length / totalMatches * 100;
+      
+      // Recent performance (last 7 days)
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      const recentReferrals = referrals.filter(r => new Date(r.created_at) > sevenDaysAgo);
+      const recentAvgScore = recentReferrals.length > 0 
+        ? recentReferrals.reduce((sum, r) => sum + (r.match_score || 0), 0) / recentReferrals.length 
+        : 0;
+      
+      // Score distribution
+      const excellentMatches = referrals.filter(r => r.match_score >= 0.8).length;
+      const goodMatches = referrals.filter(r => r.match_score >= 0.6 && r.match_score < 0.8).length;
+      const fairMatches = referrals.filter(r => r.match_score >= 0.4 && r.match_score < 0.6).length;
+      const poorMatches = referrals.filter(r => r.match_score < 0.4).length;
+      
+      const html = `
+        <div class="p-4 bg-slate-800 rounded">
+          <h4 class="font-bold text-cyan-400">Overall Performance</h4>
+          <div class="mt-2 space-y-1">
+            <div class="flex justify-between">
+              <span class="text-sm">Avg Match Score:</span>
+              <span class="font-bold">${(avgMatchScore * 100).toFixed(1)}%</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm">Total Matches:</span>
+              <span class="font-bold">${totalMatches}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm">Recent (7d):</span>
+              <span class="font-bold">${(recentAvgScore * 100).toFixed(1)}%</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="p-4 bg-slate-800 rounded">
+          <h4 class="font-bold text-green-400">Match Success Rates</h4>
+          <div class="mt-2 space-y-1">
+            <div class="flex justify-between">
+              <span class="text-sm">Specialty:</span>
+              <span class="font-bold text-green-400">${specialtyMatchRate.toFixed(1)}%</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm">Language:</span>
+              <span class="font-bold text-blue-400">${languageMatchRate.toFixed(1)}%</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm">Location:</span>
+              <span class="font-bold text-purple-400">${locationMatchRate.toFixed(1)}%</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="p-4 bg-slate-800 rounded">
+          <h4 class="font-bold text-yellow-400">Score Distribution</h4>
+          <div class="mt-2 space-y-1">
+            <div class="flex justify-between">
+              <span class="text-sm">Excellent (80%+):</span>
+              <span class="font-bold text-green-400">${excellentMatches}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm">Good (60-79%):</span>
+              <span class="font-bold text-blue-400">${goodMatches}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm">Fair (40-59%):</span>
+              <span class="font-bold text-yellow-400">${fairMatches}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm">Poor (<40%):</span>
+              <span class="font-bold text-red-400">${poorMatches}</span>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('matchQualityAnalytics').innerHTML = html;
+    }
+    async function loadSpecialtyMatches() {
+      const { data: referrals } = await supabaseClient
+        .from('referrals')
+        .select('*, clients(name, email, specialty), agents(name, email, specialties)')
+        .order('created_at', { ascending: false })
+        .limit(10);
+      
+      const specialtyIcons = {
+        'Crypto': '🪙',
+        'Luxury': '✨',
+        'First-Time Buyer': '🏠',
+        'Commercial': '🏬',
+        'Senior Real Estate': '👴',
+        'Military Relocation': '🎖️',
+        'International Buyer': '🌍',
+        'Probate & Divorce': '⚖️',
+        'Property Management': '🔧',
+        'Investment Properties': '💰',
+        'Distressed Properties': '🏦',
+        'Vacation/Second Home': '🏝️'
+      };
+
+      const html = referrals.map(r => {
+        const clientSpecialties = r.client_specialties || (r.clients?.specialty ? [r.clients.specialty] : []);
+        const agentSpecialties = r.agents?.specialties || [];
+        const specialtyMatch = clientSpecialties.some(s => agentSpecialties.includes(s));
+        
+        return `
+          <div class="p-4 bg-slate-800 rounded">
+            <h4 class="font-bold">${r.agents?.name} → ${r.clients?.name}</h4>
+            <div class="mt-2 space-y-2">
+              <div class="flex justify-between items-center">
+                <span>Client Needs:</span>
+                <div class="flex gap-1">
+                  ${clientSpecialties.map(s => `${specialtyIcons[s] || ''} ${s}`).join(', ') || 'None specified'}
+                </div>
+              </div>
+              <div class="flex justify-between items-center">
+                <span>Agent Specialties:</span>
+                <div class="flex gap-1">
+                  ${agentSpecialties.map(s => `${specialtyIcons[s] || ''} ${s}`).join(', ')}
+                </div>
+              </div>
+              <div class="flex justify-between">
+                <span>Specialty Match:</span>
+                <span class="${specialtyMatch ? 'text-green-400' : 'text-red-400'} font-bold">
+                  ${specialtyMatch ? '✓ PERFECT MATCH' : '✗ NO MATCH'}
+                </span>
+              </div>
+              <div class="flex justify-between">
+                <span>Match Score:</span>
+                <span class="font-bold text-cyan-400">${r.match_score ? (r.match_score * 100).toFixed(1) : 'N/A'}%</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      document.getElementById('specialtyMatches').innerHTML = html || '<p class="text-slate-400">No specialty matches found</p>';
+    }
+
+    // Load specialty analytics
+    async function loadSpecialtyAnalytics() {
+      const { data: referrals } = await supabaseClient
+        .from('referrals')
+        .select('specialty_match, client_specialties, agent_specialties');
+      
+      // Calculate specialty match rates
+      const specialtyStats = {};
+      referrals.forEach(r => {
+        r.client_specialties?.forEach(specialty => {
+          if (!specialtyStats[specialty]) {
+            specialtyStats[specialty] = { total: 0, matched: 0 };
+          }
+          specialtyStats[specialty].total++;
+          if (r.specialty_match) specialtyStats[specialty].matched++;
+        });
+      });
+      
+      const html = Object.entries(specialtyStats).map(([specialty, stats]) => `
+        <div class="p-4 bg-slate-800 rounded">
+          <h4 class="font-bold">${specialty}</h4>
+          <div class="mt-2">
+            <div class="text-sm text-slate-400">Match Rate</div>
+            <div class="text-xl font-bold text-cyan-400">
+              ${stats.total > 0 ? (stats.matched / stats.total * 100).toFixed(1) : 0}%
+            </div>
+            <div class="text-xs text-slate-500">${stats.matched}/${stats.total} matches</div>
+          </div>
+        </div>
+      `).join('');
+      
+      document.getElementById('specialtyAnalytics').innerHTML = html || '<p class="text-slate-400">No specialty analytics available</p>';
+    }
+
+    // Load enhanced agent performance rankings with response/acceptance rates
+    async function loadAgentPerformanceRankings() {
+      const { data: agents } = await supabaseClient
+        .from('agents')
+        .select('*, referrals!inner(match_score, specialty_match, language_match, location_match, signature_completed_at, agent_accepted_at, created_at)')
+        .eq('is_active', true)
+        .order('referrals(match_score)', { ascending: false })
+        .limit(15);
+      
+      const html = agents.map((agent, index) => {
+        const referrals = agent.referrals || [];
+        const avgScore = referrals.reduce((sum, r) => sum + (r.match_score || 0), 0) / referrals.length || 0;
+        const specialtyMatchRate = referrals.filter(r => r.specialty_match).length / referrals.length || 0;
+        const languageMatchRate = referrals.filter(r => r.language_match).length / referrals.length || 0;
+        const locationMatchRate = referrals.filter(r => r.location_match).length / referrals.length || 0;
+        const acceptanceRate = referrals.filter(r => r.signature_completed_at !== null).length / referrals.length || 0;
+        const responseRate = referrals.filter(r => r.agent_accepted_at !== null).length / referrals.length || 0;
+        
+        // Calculate performance tier
+        let performanceTier = 'Bronze';
+        let tierColor = 'text-orange-400';
+        if (avgScore >= 0.8 && acceptanceRate >= 0.7) {
+          performanceTier = 'Platinum';
+          tierColor = 'text-purple-400';
+        } else if (avgScore >= 0.7 && acceptanceRate >= 0.5) {
+          performanceTier = 'Gold';
+          tierColor = 'text-yellow-400';
+        } else if (avgScore >= 0.6 && acceptanceRate >= 0.3) {
+          performanceTier = 'Silver';
+          tierColor = 'text-slate-400';
+        }
+        
+        return `
+          <div class="p-4 bg-slate-800 rounded">
+            <div class="flex justify-between items-start">
+              <div>
+                <h4 class="font-bold">${index + 1}. ${agent.name}</h4>
+                <div class="text-sm text-slate-400">${agent.email}</div>
+                <div class="text-xs text-slate-500 mt-1">
+                  Specialties: ${agent.specialties?.slice(0, 3).join(', ') || 'None'}
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="text-lg font-bold ${tierColor}">${performanceTier}</div>
+                <div class="text-xs text-slate-400">Tier</div>
+              </div>
+            </div>
+            
+            <div class="mt-3 grid grid-cols-2 gap-2 text-xs">
+              <div class="flex justify-between">
+                <span>Referrals:</span>
+                <span class="font-bold">${referrals.length}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Avg Score:</span>
+                <span class="font-bold text-cyan-400">${(avgScore * 100).toFixed(1)}%</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Acceptance:</span>
+                <span class="font-bold text-green-400">${(acceptanceRate * 100).toFixed(1)}%</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Response:</span>
+                <span class="font-bold text-blue-400">${(responseRate * 100).toFixed(1)}%</span>
+              </div>
+            </div>
+            
+            <div class="mt-2 grid grid-cols-3 gap-1 text-xs">
+              <div class="text-center">
+                <div class="text-green-400 font-bold">${(specialtyMatchRate * 100).toFixed(0)}%</div>
+                <div class="text-slate-500">Specialty</div>
+              </div>
+              <div class="text-center">
+                <div class="text-blue-400 font-bold">${(languageMatchRate * 100).toFixed(0)}%</div>
+                <div class="text-slate-500">Language</div>
+              </div>
+              <div class="text-center">
+                <div class="text-purple-400 font-bold">${(locationMatchRate * 100).toFixed(0)}%</div>
+                <div class="text-slate-500">Location</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      document.getElementById('agentPerformanceRankings').innerHTML = html || '<p class="text-slate-400">No agent performance data available</p>';
     }
 
     // Actions
