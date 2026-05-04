@@ -26,15 +26,15 @@ window.deleteClient = async function(clientId) {
   } catch (e) { alert('Error: ' + e.message); }
 };
 
-async function updateReferralStatus(referralId, status) {
+window.updateReferralStatus = async function(referralId, status) {
   try {
     const supabaseClient = window.getSupabaseClient();
     await supabaseClient.from('referrals').update({ status }).eq('id', referralId);
     loadReferrals();
   } catch (e) { alert('Error: ' + e.message); }
-}
+};
 
-async function triggerScraper() {
+window.triggerScraper = async function() {
   const city = document.getElementById('scrapeCity')?.value || 'Miami';
   const state = document.getElementById('scrapeState')?.value || 'FL';
   
@@ -48,9 +48,9 @@ async function triggerScraper() {
     document.getElementById('scraperStatus').innerHTML = `<p class="text-green-500">Found ${result.count || 0} agents</p>`;
     loadAgents();
   } catch (e) { document.getElementById('scraperStatus').innerHTML = `<p class="text-red-500">Error: ${e.message}</p>`; }
-}
+};
 
-function showTab(tabName) {
+window.showTab = function(tabName) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
   document.getElementById(tabName + 'Tab').classList.remove('hidden');
   document.querySelectorAll('.tab-btn').forEach(b => {
@@ -65,4 +65,4 @@ function showTab(tabName) {
   if (tabName === 'referrals') loadReferrals();
   if (tabName === 'agents') loadAgents();
   if (tabName === 'analytics') loadAnalytics();
-}
+};
