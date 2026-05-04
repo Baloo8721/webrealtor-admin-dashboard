@@ -1,17 +1,11 @@
 // Auth component - login, logout, checkAuth, setupRealtime
-const SUPABASE_URL = 'https://dponfdhixuxriqqxbbri.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwb25mZGhpeHV4cmlxcXhiYnJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4NDk0NTYsImV4cCI6MjA3NzQyNTQ1Nn0.3l4yVUzenXVMrqWxFpXPq6IGpnBSlFK7rcXhkD-LRtw';
-const RENDER_SERVER_URL = 'https://webrealtor-backend.onrender.com';
 
-let supabaseClient;
 let currentUser = null;
 
-function initAuth() {
-  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  checkAuth();
-}
-
 async function checkAuth() {
+  const supabaseClient = window.getSupabaseClient();
+  if (!supabaseClient) return;
+  
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (session) {
     currentUser = session.user;
@@ -23,6 +17,12 @@ async function checkAuth() {
 }
 
 window.login = async function() {
+  const supabaseClient = window.getSupabaseClient();
+  if (!supabaseClient) {
+    alert('System not ready, please refresh');
+    return;
+  }
+  
   const email = document.getElementById('loginEmail').value;
   const password = document.getElementById('loginPassword').value;
   const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
@@ -37,6 +37,9 @@ window.login = async function() {
 };
 
 window.logout = async function() {
+  const supabaseClient = window.getSupabaseClient();
+  if (!supabaseClient) return;
+  
   await supabaseClient.auth.signOut();
   currentUser = null;
   document.getElementById('loginScreen').classList.remove('hidden');
@@ -44,6 +47,9 @@ window.logout = async function() {
 };
 
 function setupRealtime() {
+  const supabaseClient = window.getSupabaseClient();
+  if (!supabaseClient) return;
+  
   supabaseClient.channel('dashboard')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'clients' }, () => loadDashboard())
     .on('postgres_changes', { event: '*', schema: 'public', table: 'referrals' }, () => loadDashboard())
@@ -51,8 +57,7 @@ function setupRealtime() {
     .subscribe();
 }
 
-window.getSupabaseClient = function() { return supabaseClient; };
 window.getCurrentUser = function() { return currentUser; };
 
-// Initialize on load
-document.addEventListener('DOMContentLoaded', initAuth);
+// Expose checkAuth for index.html to call
+window.initAuth = checkAuth;

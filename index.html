@@ -408,7 +408,7 @@
       supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       window.getSupabaseClient = function() { return supabaseClient; };
       window.getCurrentUser = function() { return currentUser; };
-      checkAuth();
+      window.initAuth();
     });
 
     // Show tab function
