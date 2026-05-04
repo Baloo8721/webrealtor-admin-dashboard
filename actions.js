@@ -1,4 +1,4 @@
-// Actions component - deleteAgent, toggleAgentActive, updateReferralStatus, etc
+// Actions component - deleteAgent, toggleAgentActive, updateReferralStatus, filterReferrals, filterAgents, triggerMatchingForClient, showTab
 
 window.deleteAgent = async function(agentId) {
   if (!confirm('Delete this agent?')) return;
@@ -34,6 +34,27 @@ window.updateReferralStatus = async function(referralId, status) {
   } catch (e) { alert('Error: ' + e.message); }
 };
 
+window.triggerMatchingForClient = async function(clientId) {
+  try {
+    const supabaseClient = window.getSupabaseClient();
+    const response = await fetch('https://webrealtor-backend.onrender.com/api/trigger-match', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId: clientId })
+    });
+    const result = await response.json();
+    if (response.ok) {
+      alert('Matching triggered! Processing...');
+      loadReferrals();
+    } else {
+      alert('Error: ' + (result.error || 'Failed to trigger matching'));
+    }
+  } catch (e) { 
+    console.error('Trigger matching error:', e);
+    alert('Error triggering matching: ' + e.message);
+  }
+};
+
 window.triggerScraper = async function() {
   const city = document.getElementById('scrapeCity')?.value || 'Miami';
   const state = document.getElementById('scrapeState')?.value || 'FL';
@@ -57,12 +78,16 @@ window.showTab = function(tabName) {
     b.classList.remove('bg-cyan-500');
     b.classList.add('bg-slate-700');
   });
-  event.target.classList.remove('bg-slate-700');
-  event.target.classList.add('bg-cyan-500');
+  if (event && event.target) {
+    event.target.classList.remove('bg-slate-700');
+    event.target.classList.add('bg-cyan-500');
+  }
   
   if (tabName === 'overview') loadDashboard();
   if (tabName === 'clients') loadClients();
   if (tabName === 'referrals') loadReferrals();
   if (tabName === 'agents') loadAgents();
-  if (tabName === 'analytics') loadAnalytics();
+  if (tabName === 'analytics') {
+    if (typeof loadAnalytics === 'function') loadAnalytics();
+  }
 };
