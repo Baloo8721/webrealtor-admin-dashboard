@@ -222,16 +222,6 @@
         <p class="text-xs text-slate-500 mt-2">Supports any CSV format - auto-detects columns (name, email, phone, city, state, etc.)</p>
       </div>
       
-      <!-- Cleanup Section -->
-      <div class="bg-slate-800 p-4 rounded-lg mb-6 border border-red-500/30">
-        <h3 class="text-lg font-semibold mb-3 text-red-400">🧹 Cleanup Agents</h3>
-        <div class="flex flex-wrap gap-4 items-center">
-          <button onclick="deleteNonFloridaAgents()" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded font-semibold text-white">Delete Non-Florida Agents</button>
-          <span id="cleanupStatus" class="text-sm text-slate-400">Click to remove fake/non-Florida agents</span>
-        </div>
-        <p class="text-xs text-slate-500 mt-2">Removes agents with states other than FL</p>
-      </div>
-      
       <!-- Add Agent Form -->
       <div class="bg-slate-800 p-6 rounded-lg mb-6">
         <h3 class="text-lg font-semibold mb-4 text-white">➕ Add New Agent</h3>
@@ -482,54 +472,6 @@ document.getElementById('dashboard').classList.add('hidden');
       };
       
       reader.readAsText(file);
-    };
-    
-    // Cleanup - Delete Non-Florida Agents
-    window.deleteNonFloridaAgents = async function() {
-      const statusSpan = document.getElementById('cleanupStatus');
-      
-      if (!confirm('Delete all agents NOT in Florida? This will remove fake/non-FL agents.')) {
-        return;
-      }
-      
-      statusSpan.textContent = 'Deleting non-Florida agents...';
-      
-      try {
-        // Get all agents
-        const { data: agents, error } = await supabaseClient
-          .from('agents')
-          .select('id, service_states');
-        
-        if (error) throw error;
-        
-        // Filter non-FL agents
-        const nonFLAgents = agents.filter(a => {
-          const states = a.service_states || [];
-          return !states.includes('FL');
-        });
-        
-        if (nonFLAgents.length === 0) {
-          statusSpan.textContent = '✅ No non-Florida agents found';
-          alert('No non-Florida agents to delete');
-          return;
-        }
-        
-        // Delete them
-        const agentIds = nonFLAgents.map(a => a.id);
-        const { error: deleteError } = await supabaseClient
-          .from('agents')
-          .delete()
-          .in('id', agentIds);
-        
-        if (deleteError) throw deleteError;
-        
-        statusSpan.textContent = '✅ Deleted ' + nonFLAgents.length + ' non-Florida agents';
-        alert('Successfully deleted ' + nonFLAgents.length + ' agents!');
-        loadAgents();
-      } catch (err) {
-        statusSpan.textContent = '❌ Error: ' + err.message;
-        alert('Cleanup failed: ' + err.message);
-      }
     };
 
     async function loadDashboard() {
